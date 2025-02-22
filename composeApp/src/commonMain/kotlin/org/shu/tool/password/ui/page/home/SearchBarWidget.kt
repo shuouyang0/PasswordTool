@@ -1,4 +1,4 @@
-package org.shu.tool.password.page.home
+package org.shu.tool.password.ui.page.home
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable

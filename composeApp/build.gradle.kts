@@ -38,6 +38,8 @@ kotlin {
         androidMain.dependencies {
             implementation(compose.preview)
             implementation(libs.androidx.activity.compose)
+            implementation(libs.di.koin.android)
+
         }
         val commonMain by getting{
             kotlin.srcDir("build/generated/ksp/metadata/commonMain/kotlin")
@@ -54,11 +56,15 @@ kotlin {
                 implementation(libs.db.sqllin.dsl)
                 implementation(libs.db.sqllin.driver)
                 implementation(libs.kotlinx.coroutines.core)
-                implementation(libs.kotlinx.serialization.core)
+                implementation(libs.kotlinx.serialization.json)
                 implementation(libs.network.ktor.core)
                 implementation(libs.network.ktor.cio)
+                implementation(libs.network.ktor.content)
+                implementation(libs.network.ktor.logging)
+                implementation(libs.network.ktor.serialization.json)
                 implementation(project.dependencies.platform(libs.di.koin.bom))
                 implementation(libs.di.koin.core)
+                implementation(libs.encrypt.hash.sha2)
             }
         }
         desktopMain.dependencies {

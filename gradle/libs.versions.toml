@@ -20,6 +20,8 @@ ksp = "2.1.0-1.0.29" # 这玩意替代Kapt，需要与Kotlin版本对应 https:/
 sqllin = "1.4.1"
 ktor = "3.1.0"
 koin-bom = "4.0.2"
+room = "2.7.0-beta01"
+
 
 [libraries]
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
@@ -35,24 +37,36 @@ androidx-activity-compose = { module = "androidx.activity:activity-compose", ver
 androidx-lifecycle-viewmodel = { group = "org.jetbrains.androidx.lifecycle", name = "lifecycle-viewmodel", version.ref = "androidx-lifecycle" }
 androidx-lifecycle-runtime-compose = { group = "org.jetbrains.androidx.lifecycle", name = "lifecycle-runtime-compose", version.ref = "androidx-lifecycle" }
 
+androidx-room-runtime = { group = "androidx.room", name = "room-runtime", version.ref = "room" }
+androidx-room-ktx = { group = "androidx.room", name = "room-ktx", version.ref = "room" }
+androidx-room-compiler = { group = "androidx.room", name = "room-compiler", version.ref = "room" }
+androidx-room-paging = { group = "androidx.room", name = "room-paging", version.ref = "room"}
+
 kotlinx-coroutines-core = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version.ref = "kotlinx-coroutines" }
 kotlinx-coroutines-swing = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-swing", version.ref = "kotlinx-coroutines" }
 
-kotlinx-serialization-core = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-core", version.ref = "kotlin" }
+kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version = "1.8.0" }
 
 network-ktor-core =  { group = "io.ktor", name = "ktor-client-core", version.ref = "ktor" }
 network-ktor-cio =  { group = "io.ktor", name = "ktor-client-cio", version.ref = "ktor" }
+network-ktor-logging =  { group = "io.ktor", name = "ktor-client-logging", version.ref = "ktor" }
+network-ktor-content =  { group = "io.ktor", name = "ktor-client-content-negotiation", version.ref = "ktor" }
+network-ktor-serialization-json =  { group = "io.ktor", name = "ktor-serialization-kotlinx-json", version.ref = "ktor" }
 network-okio =  { group = "com.squareup.okio", name = "okio", version = "3.10.2" }
 
 di-koin-bom = { module = "io.insert-koin:koin-bom", version.ref = "koin-bom" }
 di-koin-core = { module = "io.insert-koin:koin-core" }
+di-koin-android = { module = "io.insert-koin:koin-android" }
 
 image-loader-coil = {group = "io.coil-kt.coil3", name = "coil-compose", version.ref = "coil" }
 image-loader-coil-network = {group = "io.coil-kt.coil3", name = "coil-network-okhttp", version.ref = "coil"  }
 
+
 db-sqllin-dsl = {group = "com.ctrip.kotlin", name = "sqllin-dsl", version.ref = "sqllin"}
 db-sqllin-driver = {group = "com.ctrip.kotlin", name = "sqllin-driver", version.ref = "sqllin"}
 db-sqllin-processor = {group = "com.ctrip.kotlin", name = "sqllin-processor", version.ref = "sqllin"}
+
+encrypt-hash-sha2 = { group = "org.kotlincrypto.hash" ,name = "sha2", version = "0.6.1" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }
