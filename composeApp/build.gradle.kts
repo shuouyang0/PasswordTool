@@ -7,6 +7,8 @@ plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.composeCompiler)
+    alias(libs.plugins.google.devtools.ksp)
+    alias(libs.plugins.serialization)
 }
 
 kotlin {
@@ -37,15 +39,27 @@ kotlin {
             implementation(compose.preview)
             implementation(libs.androidx.activity.compose)
         }
-        commonMain.dependencies {
-            implementation(compose.runtime)
-            implementation(compose.foundation)
-            implementation(compose.material)
-            implementation(compose.ui)
-            implementation(compose.components.resources)
-            implementation(compose.components.uiToolingPreview)
-            implementation(libs.androidx.lifecycle.viewmodel)
-            implementation(libs.androidx.lifecycle.runtime.compose)
+        val commonMain by getting{
+            kotlin.srcDir("build/generated/ksp/metadata/commonMain/kotlin")
+            dependencies {
+                implementation(compose.runtime)
+                implementation(compose.foundation)
+                implementation(compose.material3)
+                implementation(compose.ui)
+                implementation(compose.components.resources)
+                implementation(compose.components.uiToolingPreview)
+                implementation(libs.androidx.lifecycle.viewmodel)
+                implementation(libs.androidx.lifecycle.runtime.compose)
+
+                implementation(libs.db.sqllin.dsl)
+                implementation(libs.db.sqllin.driver)
+                implementation(libs.kotlinx.coroutines.core)
+                implementation(libs.kotlinx.serialization.core)
+                implementation(libs.network.ktor.core)
+                implementation(libs.network.ktor.cio)
+                implementation(project.dependencies.platform(libs.di.koin.bom))
+                implementation(libs.di.koin.core)
+            }
         }
         desktopMain.dependencies {
             implementation(compose.desktop.currentOs)
@@ -83,6 +97,7 @@ android {
 
 dependencies {
     debugImplementation(compose.uiTooling)
+    kspCommonMainMetadata(libs.db.sqllin.processor)
 }
 
 compose.desktop {
