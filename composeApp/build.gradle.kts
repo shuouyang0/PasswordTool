@@ -7,8 +7,9 @@ plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.composeCompiler)
-    alias(libs.plugins.google.devtools.ksp)
     alias(libs.plugins.serialization)
+    alias(libs.plugins.ksp)
+    alias(libs.plugins.room)
 }
 
 kotlin {
@@ -53,8 +54,14 @@ kotlin {
                 implementation(libs.androidx.lifecycle.viewmodel)
                 implementation(libs.androidx.lifecycle.runtime.compose)
 
-                implementation(libs.db.sqllin.dsl)
-                implementation(libs.db.sqllin.driver)
+                implementation(libs.androidx.room.runtime)
+//                implementation(libs.androidx.room.paging)
+                implementation(libs.sqlite)
+                implementation(libs.sqlite.bundled)
+//                implementation(libs.androidx.room.ktx)
+                implementation(libs.androidx.paging.compose)
+                implementation(libs.androidx.paging.common)
+
                 implementation(libs.kotlinx.coroutines.core)
                 implementation(libs.kotlinx.serialization.json)
                 implementation(libs.network.ktor.core)
@@ -63,7 +70,9 @@ kotlin {
                 implementation(libs.network.ktor.logging)
                 implementation(libs.network.ktor.serialization.json)
                 implementation(project.dependencies.platform(libs.di.koin.bom))
-                implementation(libs.di.koin.core)
+                implementation(libs.di.koin.compose)
+                implementation(libs.di.koin.viewmodel)
+                implementation(libs.di.koin.viewmodel.navigation)
                 implementation(libs.encrypt.hash.sha2)
             }
         }
@@ -103,7 +112,7 @@ android {
 
 dependencies {
     debugImplementation(compose.uiTooling)
-    kspCommonMainMetadata(libs.db.sqllin.processor)
+    ksp(libs.androidx.room.compiler)
 }
 
 compose.desktop {
@@ -117,3 +126,8 @@ compose.desktop {
         }
     }
 }
+
+room {
+    schemaDirectory("$projectDir/schemas")
+}
+

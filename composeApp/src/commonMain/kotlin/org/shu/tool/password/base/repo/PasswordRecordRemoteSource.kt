@@ -1,4 +1,8 @@
 package org.shu.tool.password.base.repo
 
-class PasswordRecordRemoteSource {
+import io.ktor.client.HttpClient
+
+class PasswordRecordRemoteSource(
+    private val httpClient: HttpClient
+) {
 }

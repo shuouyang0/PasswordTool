@@ -1,6 +1,7 @@
 package org.shu.tool.password.base.module
 
-import com.ctrip.sqllin.dsl.annotation.DBRow
+import androidx.room.Entity
+import androidx.room.PrimaryKey
 import io.ktor.http.Url
 import kotlinx.serialization.Serializable
 import org.shu.tool.password.util.isEmail
@@ -9,9 +10,10 @@ import org.shu.tool.password.util.maskEmail
 import org.shu.tool.password.util.maskPhoneNumber
 
 //records
-@DBRow("password_record")
+@Entity("password_record")
 @Serializable
 data class PasswordRecord(
+    @PrimaryKey(autoGenerate = true)
     val id:Long? = null,
     /**
      * 网站链接 必须

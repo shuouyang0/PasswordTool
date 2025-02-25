@@ -1,26 +1,24 @@
 package org.shu.tool.password
 
-import android.app.Application
-import android.os.Build
 import androidx.room.Room
 import androidx.sqlite.driver.bundled.BundledSQLiteDriver
 import kotlinx.coroutines.Dispatchers
-import org.koin.core.module.Module
-import org.koin.dsl.module
 import org.shu.tool.password.base.common.DATABASE_FILENAME
 import org.shu.tool.password.base.db.AppDatabase
+import java.io.File
 
 
-class AndroidPlatform : Platform {
-    override val name: String = "Android ${Build.VERSION.SDK_INT}"
+class JVMPlatform : Platform {
+    override val name: String = "Java ${System.getProperty("java.version")}"
 }
 
-actual fun getPlatform(): Platform = AndroidPlatform()
+actual fun getPlatform(): Platform = JVMPlatform()
 
 
-actual class DiPlatformFactory(private val app: Application) {
+actual class DiPlatformFactory {
     actual fun createDatabase(): AppDatabase {
-        return Room.databaseBuilder(app, AppDatabase::class.java, DATABASE_FILENAME)
+        val dbFile = File(System.getProperty("java.io.tmpdir"), DATABASE_FILENAME)
+        return Room.databaseBuilder<AppDatabase>(name = dbFile.absolutePath)
             .setDriver(BundledSQLiteDriver())
             .setQueryCoroutineContext(Dispatchers.IO)
             .build()

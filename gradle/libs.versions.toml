@@ -17,11 +17,12 @@ kotlin = "2.1.0"
 kotlinx-coroutines = "1.10.1"
 coil = "3.1.0"
 ksp = "2.1.0-1.0.29" # 这玩意替代Kapt，需要与Kotlin版本对应 https://github.com/google/ksp/releases?page=4
-sqllin = "1.4.1"
 ktor = "3.1.0"
 koin-bom = "4.0.2"
-room = "2.7.0-beta01"
 
+room = "2.7.0-beta01"
+sqlite = "2.5.0-SNAPSHOT"
+paging  = "3.3.6"
 
 [libraries]
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
@@ -38,9 +39,14 @@ androidx-lifecycle-viewmodel = { group = "org.jetbrains.androidx.lifecycle", nam
 androidx-lifecycle-runtime-compose = { group = "org.jetbrains.androidx.lifecycle", name = "lifecycle-runtime-compose", version.ref = "androidx-lifecycle" }
 
 androidx-room-runtime = { group = "androidx.room", name = "room-runtime", version.ref = "room" }
-androidx-room-ktx = { group = "androidx.room", name = "room-ktx", version.ref = "room" }
 androidx-room-compiler = { group = "androidx.room", name = "room-compiler", version.ref = "room" }
 androidx-room-paging = { group = "androidx.room", name = "room-paging", version.ref = "room"}
+
+sqlite-bundled = { module = "androidx.sqlite:sqlite-bundled", version.ref = "sqlite" }
+sqlite = { module = "androidx.sqlite:sqlite", version.ref = "sqlite" }
+
+androidx-paging-common = { group = "androidx.paging", name = "paging-common", version.ref = "paging" }
+androidx-paging-compose = { group = "androidx.paging", name = "paging-compose", version.ref = "paging" }
 
 kotlinx-coroutines-core = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version.ref = "kotlinx-coroutines" }
 kotlinx-coroutines-swing = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-swing", version.ref = "kotlinx-coroutines" }
@@ -55,16 +61,14 @@ network-ktor-serialization-json =  { group = "io.ktor", name = "ktor-serializati
 network-okio =  { group = "com.squareup.okio", name = "okio", version = "3.10.2" }
 
 di-koin-bom = { module = "io.insert-koin:koin-bom", version.ref = "koin-bom" }
-di-koin-core = { module = "io.insert-koin:koin-core" }
+di-koin-compose = { module = "io.insert-koin:koin-compose" }
+di-koin-viewmodel = { module = "io.insert-koin:koin-compose-viewmodel" }
+di-koin-viewmodel-navigation = { module = "io.insert-koin:koin-compose-viewmodel-navigation" }
+
 di-koin-android = { module = "io.insert-koin:koin-android" }
 
 image-loader-coil = {group = "io.coil-kt.coil3", name = "coil-compose", version.ref = "coil" }
 image-loader-coil-network = {group = "io.coil-kt.coil3", name = "coil-network-okhttp", version.ref = "coil"  }
-
-
-db-sqllin-dsl = {group = "com.ctrip.kotlin", name = "sqllin-dsl", version.ref = "sqllin"}
-db-sqllin-driver = {group = "com.ctrip.kotlin", name = "sqllin-driver", version.ref = "sqllin"}
-db-sqllin-processor = {group = "com.ctrip.kotlin", name = "sqllin-processor", version.ref = "sqllin"}
 
 encrypt-hash-sha2 = { group = "org.kotlincrypto.hash" ,name = "sha2", version = "0.6.1" }
 
@@ -73,6 +77,7 @@ androidApplication = { id = "com.android.application", version.ref = "agp" }
 androidLibrary = { id = "com.android.library", version.ref = "agp" }
 composeMultiplatform = { id = "org.jetbrains.compose", version.ref = "compose-multiplatform" }
 composeCompiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
-google-devtools-ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
+serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
+ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
+room = { id = "androidx.room", version.ref = "room" }

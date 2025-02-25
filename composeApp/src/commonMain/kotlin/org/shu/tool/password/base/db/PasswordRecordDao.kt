@@ -1,56 +1,46 @@
 package org.shu.tool.password.base.db
-import com.ctrip.sqllin.dsl.Database
-import com.ctrip.sqllin.dsl.sql.clause.EQ
-import com.ctrip.sqllin.dsl.sql.clause.ORDER_BY
-import com.ctrip.sqllin.dsl.sql.clause.OrderByWay.DESC
-import com.ctrip.sqllin.dsl.sql.clause.SET
-import com.ctrip.sqllin.dsl.sql.clause.WHERE
-import com.ctrip.sqllin.dsl.sql.statement.SelectStatement
+
+import androidx.paging.PagingSource
+import androidx.room.Dao
+import androidx.room.Delete
+import androidx.room.Insert
+import androidx.room.OnConflictStrategy
+import androidx.room.Query
+import androidx.room.Transaction
+import androidx.room.Update
+import androidx.room.Upsert
 import org.shu.tool.password.base.module.PasswordRecord
-import org.shu.tool.password.module.PasswordRecordTable
 
-class PasswordRecordDao(private val database: Database){
-    fun obtainAll():List<PasswordRecord>{
-        lateinit var selectStatement: SelectStatement<PasswordRecord>
-        database{
-            PasswordRecordTable{ table: PasswordRecordTable ->
-                selectStatement = table SELECT ORDER_BY (registerDate to DESC)
-            }
-        }
-        return selectStatement.getResults()
-    }
-    fun insert(records: List<PasswordRecord>){
-        database{
-            PasswordRecordTable{ table: PasswordRecordTable ->
-                table INSERT records
-            }
-        }
-    }
+@Dao
+interface PasswordRecordDao {
 
-    fun delete(targetId:Long) {
-        database {
-            PasswordRecordTable { table: PasswordRecordTable ->
-                table DELETE WHERE (id EQ targetId)
-            }
-        }
-    }
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insert(record: PasswordRecord)
 
-    fun update(record: PasswordRecord){
-        database{
-            PasswordRecordTable{ table: PasswordRecordTable ->
-                table UPDATE SET {
-                    websiteLink = record.websiteLink
-                    account = record.account
-                    accountType = record.accountType
-                    passwordType = record.passwordType
-                    cipher = record.cipher
-                    registerDate = record.registerDate
-                    nickname = record.nickname
-                    username = record.username
-                    modifyDate = record.modifyDate
-                    remark = record.remark
-                } WHERE (id EQ record.id!!)
-            }
-        }
-    }
+    @Update
+    suspend fun update(record: PasswordRecord)
+
+    @Upsert
+    suspend fun upsert(record: PasswordRecord)
+
+    @Delete
+    suspend fun delete(record: PasswordRecord)
+
+    @Query("SELECT * FROM key_records WHERE id = :id")
+    fun getRecordById(id: String): PasswordRecord?
+
+    @Query("""
+        SELECT * FROM key_records
+        ORDER BY COALESCE(modifyDate, registerDate) DESC
+    """)
+    fun getPasswordRecords(): PagingSource<Int, PasswordRecord>
+
+    @Transaction
+    @Query("SELECT * FROM key_records WHERE " +
+            "websiteLink LIKE :key OR " +
+            "account LIKE :key OR " +
+            "nickname LIKE :key OR " +
+            "username LIKE :key OR " +
+            "remark LIKE :key")
+    fun getPasswordRecordsByKeyword(key: String): PagingSource<Int, PasswordRecord>
 }
