@@ -1,6 +1,6 @@
 [versions]
 agp = "8.5.2"
-android-compileSdk = "34"
+android-compileSdk = "35"
 android-minSdk = "24"
 android-targetSdk = "34"
 androidx-activityCompose = "1.9.3"
@@ -22,7 +22,7 @@ koin-bom = "4.0.2"
 
 room = "2.7.0-beta01"
 sqlite = "2.5.0-SNAPSHOT"
-paging  = "3.3.0-alpha02-0.5.1"
+paging = "3.3.0-alpha02-0.5.1"
 
 [libraries]
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
@@ -40,7 +40,7 @@ androidx-lifecycle-runtime-compose = { group = "org.jetbrains.androidx.lifecycle
 
 androidx-room-runtime = { group = "androidx.room", name = "room-runtime", version.ref = "room" }
 androidx-room-compiler = { group = "androidx.room", name = "room-compiler", version.ref = "room" }
-androidx-room-paging = { group = "androidx.room", name = "room-paging", version.ref = "room"}
+androidx-room-paging = { group = "androidx.room", name = "room-paging", version.ref = "room" }
 
 sqlite-bundled = { module = "androidx.sqlite:sqlite-bundled", version.ref = "sqlite" }
 sqlite = { module = "androidx.sqlite:sqlite", version.ref = "sqlite" }
@@ -50,16 +50,17 @@ androidx-paging-compose = { group = "app.cash.paging", name = "paging-compose-co
 
 kotlinx-coroutines-core = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version.ref = "kotlinx-coroutines" }
 kotlinx-coroutines-swing = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-swing", version.ref = "kotlinx-coroutines" }
+kotlinx-datetime = { group = "org.jetbrains.kotlinx", name = "kotlinx-datetime", version = "0.6.2" }
 
 kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version = "1.8.0" }
 kotlin-reflect = { group = "org.jetbrains.kotlin", name = "kotlin-reflect", version = "2.1.10" }
 
-network-ktor-core =  { group = "io.ktor", name = "ktor-client-core", version.ref = "ktor" }
-network-ktor-cio =  { group = "io.ktor", name = "ktor-client-cio", version.ref = "ktor" }
-network-ktor-logging =  { group = "io.ktor", name = "ktor-client-logging", version.ref = "ktor" }
-network-ktor-content =  { group = "io.ktor", name = "ktor-client-content-negotiation", version.ref = "ktor" }
-network-ktor-serialization-json =  { group = "io.ktor", name = "ktor-serialization-kotlinx-json", version.ref = "ktor" }
-network-okio =  { group = "com.squareup.okio", name = "okio", version = "3.10.2" }
+network-ktor-core = { group = "io.ktor", name = "ktor-client-core", version.ref = "ktor" }
+network-ktor-cio = { group = "io.ktor", name = "ktor-client-cio", version.ref = "ktor" }
+network-ktor-logging = { group = "io.ktor", name = "ktor-client-logging", version.ref = "ktor" }
+network-ktor-content = { group = "io.ktor", name = "ktor-client-content-negotiation", version.ref = "ktor" }
+network-ktor-serialization-json = { group = "io.ktor", name = "ktor-serialization-kotlinx-json", version.ref = "ktor" }
+network-okio = { group = "com.squareup.okio", name = "okio", version = "3.10.2" }
 
 di-koin-bom = { module = "io.insert-koin:koin-bom", version.ref = "koin-bom" }
 di-koin-compose = { module = "io.insert-koin:koin-compose" }
@@ -68,10 +69,10 @@ di-koin-viewmodel-navigation = { module = "io.insert-koin:koin-compose-viewmodel
 
 di-koin-android = { module = "io.insert-koin:koin-android" }
 
-image-loader-coil = {group = "io.coil-kt.coil3", name = "coil-compose", version.ref = "coil" }
-image-loader-coil-network = {group = "io.coil-kt.coil3", name = "coil-network-okhttp", version.ref = "coil"  }
+image-loader-coil = { group = "io.coil-kt.coil3", name = "coil-compose", version.ref = "coil" }
+image-loader-coil-network = { group = "io.coil-kt.coil3", name = "coil-network-okhttp", version.ref = "coil" }
 
-encrypt-hash-sha2 = { group = "org.kotlincrypto.hash" ,name = "sha2", version = "0.6.1" }
+encrypt-hash-sha2 = { group = "org.kotlincrypto.hash", name = "sha2", version = "0.6.1" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }

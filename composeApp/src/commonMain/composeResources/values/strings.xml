@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">PasswordTool</string>
+    <string name="account_s">账号：%s</string>
+</resources>

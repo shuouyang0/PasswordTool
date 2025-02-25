@@ -54,16 +54,20 @@ kotlin {
                 implementation(libs.androidx.lifecycle.viewmodel)
                 implementation(libs.androidx.lifecycle.runtime.compose)
 
+                implementation(libs.image.loader.coil)
+                implementation(libs.image.loader.coil.network)
+
                 implementation(libs.androidx.room.runtime)
                 implementation(libs.androidx.room.paging)
                 implementation(libs.sqlite)
                 implementation(libs.sqlite.bundled)
-//                implementation(libs.androidx.room.ktx)
+
                 implementation(libs.androidx.paging.compose)
                 implementation(libs.androidx.paging.common)
 
                 implementation(libs.kotlinx.coroutines.core)
                 implementation(libs.kotlinx.serialization.json)
+                implementation(libs.kotlinx.datetime)
 
                 implementation(libs.network.ktor.core)
                 implementation(libs.network.ktor.cio)

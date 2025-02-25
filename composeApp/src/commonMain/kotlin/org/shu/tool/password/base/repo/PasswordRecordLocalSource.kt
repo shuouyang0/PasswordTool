@@ -6,5 +6,5 @@ class PasswordRecordLocalSource(
     private val _dao: PasswordRecordDao
 ) {
     //TODO:处理数据同步的相关东西
-    fun obtainAll() = _dao.getPasswordRecords()
+//    fun obtainAll() = _dao.getPasswordRecords()
 }

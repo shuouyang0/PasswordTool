@@ -6,5 +6,5 @@ class PasswordRecordRepository(
     private val _remoteSource: PasswordRecordRemoteSource
 ) {
     //TODO:负责协调本地和远程数据，保持同步
-    fun obtainPasswordRecords() = _localSource.obtainAll()
+//    fun obtainPasswordRecords() = _localSource.obtainAll()
 }
