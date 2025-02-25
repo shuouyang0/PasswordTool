@@ -55,7 +55,7 @@ kotlin {
                 implementation(libs.androidx.lifecycle.runtime.compose)
 
                 implementation(libs.androidx.room.runtime)
-//                implementation(libs.androidx.room.paging)
+                implementation(libs.androidx.room.paging)
                 implementation(libs.sqlite)
                 implementation(libs.sqlite.bundled)
 //                implementation(libs.androidx.room.ktx)
@@ -64,16 +64,20 @@ kotlin {
 
                 implementation(libs.kotlinx.coroutines.core)
                 implementation(libs.kotlinx.serialization.json)
+
                 implementation(libs.network.ktor.core)
                 implementation(libs.network.ktor.cio)
                 implementation(libs.network.ktor.content)
                 implementation(libs.network.ktor.logging)
                 implementation(libs.network.ktor.serialization.json)
+
                 implementation(project.dependencies.platform(libs.di.koin.bom))
                 implementation(libs.di.koin.compose)
                 implementation(libs.di.koin.viewmodel)
                 implementation(libs.di.koin.viewmodel.navigation)
+
                 implementation(libs.encrypt.hash.sha2)
+                runtimeOnly(libs.kotlin.reflect)
             }
         }
         desktopMain.dependencies {

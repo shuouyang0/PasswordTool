@@ -22,7 +22,7 @@ koin-bom = "4.0.2"
 
 room = "2.7.0-beta01"
 sqlite = "2.5.0-SNAPSHOT"
-paging  = "3.3.6"
+paging  = "3.3.0-alpha02-0.5.1"
 
 [libraries]
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
@@ -45,13 +45,14 @@ androidx-room-paging = { group = "androidx.room", name = "room-paging", version.
 sqlite-bundled = { module = "androidx.sqlite:sqlite-bundled", version.ref = "sqlite" }
 sqlite = { module = "androidx.sqlite:sqlite", version.ref = "sqlite" }
 
-androidx-paging-common = { group = "androidx.paging", name = "paging-common", version.ref = "paging" }
-androidx-paging-compose = { group = "androidx.paging", name = "paging-compose", version.ref = "paging" }
+androidx-paging-common = { group = "app.cash.paging", name = "paging-common", version.ref = "paging" }
+androidx-paging-compose = { group = "app.cash.paging", name = "paging-compose-common", version.ref = "paging" }
 
 kotlinx-coroutines-core = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version.ref = "kotlinx-coroutines" }
 kotlinx-coroutines-swing = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-swing", version.ref = "kotlinx-coroutines" }
 
 kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version = "1.8.0" }
+kotlin-reflect = { group = "org.jetbrains.kotlin", name = "kotlin-reflect", version = "2.1.10" }
 
 network-ktor-core =  { group = "io.ktor", name = "ktor-client-core", version.ref = "ktor" }
 network-ktor-cio =  { group = "io.ktor", name = "ktor-client-cio", version.ref = "ktor" }

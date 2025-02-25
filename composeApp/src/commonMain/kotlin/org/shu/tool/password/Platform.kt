@@ -1,18 +1,17 @@
 package org.shu.tool.password
 
-import org.koin.core.module.Module
 import org.shu.tool.password.base.db.AppDatabase
+
+import org.koin.core.scope.Scope
 
 interface Platform {
     val name: String
 }
 
-expect fun getPlatform(): Platform
+expect fun getPlatform(scope: Scope): Platform
 
 /**
  * 用于注入平台相关的模块
  */
-expect class DiPlatformFactory {
-    fun createDatabase(): AppDatabase
-}
+expect fun getDatabase(scope: Scope): AppDatabase
 

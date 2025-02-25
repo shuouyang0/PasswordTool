@@ -1,18 +1,19 @@
 package org.shu.tool.password
 
 import android.app.Application
+import android.util.Log
 import org.koin.android.ext.koin.androidContext
-import org.koin.core.context.startKoin
-import org.koin.dsl.module
-import org.shu.tool.password.base.di.diCommonModule
+import org.koin.android.ext.koin.androidLogger
+import org.shu.tool.password.base.di.initKoin
 
-class AndroidApp:Application() {
+
+class AndroidApp : Application() {
     override fun onCreate() {
         super.onCreate()
-        startKoin {
+        Log.d("shuouyang", "onCreate: =====================INIT====================")
+        initKoin {
             androidContext(this@AndroidApp)
-            module { single { DiPlatformFactory(get()) } }
-            diCommonModule()
+            androidLogger()
         }
     }
 }

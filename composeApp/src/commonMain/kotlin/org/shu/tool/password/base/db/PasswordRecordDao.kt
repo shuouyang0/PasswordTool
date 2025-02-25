@@ -26,17 +26,17 @@ interface PasswordRecordDao {
     @Delete
     suspend fun delete(record: PasswordRecord)
 
-    @Query("SELECT * FROM key_records WHERE id = :id")
+    @Query("SELECT * FROM password_record WHERE id = :id")
     fun getRecordById(id: String): PasswordRecord?
 
     @Query("""
-        SELECT * FROM key_records
+        SELECT * FROM password_record
         ORDER BY COALESCE(modifyDate, registerDate) DESC
     """)
     fun getPasswordRecords(): PagingSource<Int, PasswordRecord>
 
     @Transaction
-    @Query("SELECT * FROM key_records WHERE " +
+    @Query("SELECT * FROM password_record WHERE " +
             "websiteLink LIKE :key OR " +
             "account LIKE :key OR " +
             "nickname LIKE :key OR " +

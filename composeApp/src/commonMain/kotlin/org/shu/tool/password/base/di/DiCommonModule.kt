@@ -1,57 +1,67 @@
 package org.shu.tool.password.base.di
 
-import org.koin.core.KoinApplication
 import org.koin.core.module.dsl.singleOf
 import org.koin.core.module.dsl.viewModelOf
 import org.koin.dsl.module
-import org.shu.tool.password.DiPlatformFactory
 import org.shu.tool.password.base.db.AppDatabase
 import org.shu.tool.password.base.network.createHttpClient
 import org.shu.tool.password.base.repo.PasswordRecordLocalSource
 import org.shu.tool.password.base.repo.PasswordRecordRemoteSource
 import org.shu.tool.password.base.repo.PasswordRecordRepository
+import org.shu.tool.password.getPlatform
 import org.shu.tool.password.ui.page.home.HomeViewModel
 import org.shu.tool.password.ui.page.detail.DetailViewModel
-private val databaseModule by lazy {
-    module {
-        single { (factory: DiPlatformFactory) -> factory.createDatabase() }
-        single { (database: AppDatabase) -> database.passwordRecordDao() }
-    }
-}
+import org.koin.core.context.startKoin
+import org.koin.dsl.KoinAppDeclaration
+import org.koin.dsl.includes
+import org.shu.tool.password.getDatabase
 
-private val networkModule by lazy {
-    module {
+private val appModule = module {
+    factory { getPlatform(this) }
+}
+private val databaseModule
+    get() = module {
+        single{ getDatabase(this) }
+        singleOf(AppDatabase::passwordRecordDao)
+    }
+
+private val networkModule
+    get() = module {
         single { createHttpClient() }
     }
-}
 
-private val sourceModule by lazy {
-    module {
+private val sourceModule
+    get() = module {
         singleOf(::PasswordRecordLocalSource)
         singleOf(::PasswordRecordRemoteSource)
     }
-}
-private val repoModule by lazy {
-    module {
+
+private val repoModule
+    get() = module {
         singleOf(::PasswordRecordRepository)
     }
-}
 
-private val viewModule by lazy {
-    module {
+private val viewModule
+    get() = module {
         viewModelOf(::HomeViewModel)
         viewModelOf(::DetailViewModel)
     }
-}
 
 
-//用于注入通用的依赖模块
-fun KoinApplication.diCommonModule() {
-    modules(
-        databaseModule,
-        networkModule,
-        repoModule,
-        viewModule
-    )
 
+
+
+fun initKoin(config : KoinAppDeclaration? = null){
+    startKoin {
+        printLogger()
+        includes(config)
+        modules(
+            appModule,
+            databaseModule,
+            networkModule,
+            sourceModule,
+            repoModule,
+            viewModule
+        )
+    }
 }
