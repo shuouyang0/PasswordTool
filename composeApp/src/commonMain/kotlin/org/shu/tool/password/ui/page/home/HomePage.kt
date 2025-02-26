@@ -56,6 +56,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.drawscope.translate
 import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.input.key.Key
+import androidx.compose.ui.input.key.KeyEvent
+import androidx.compose.ui.input.key.key
+import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalClipboardManager
@@ -360,8 +364,24 @@ fun PasswordWidget(
         }
 
         AnimatedVisibility(state <= 0) {
+            val auth = {
+                state = if (verifyPrivateKey(privateKey)) {
+                    coroutineScope.launch {
+                        delay(1000)
+                        password = computeCipher(privateKey)
+                    }
+                    1
+                } else {
+                    -1
+                }
+            }
             OutlinedTextField(
-                modifier = Modifier.fillMaxSize(),
+                modifier = Modifier.fillMaxSize().onKeyEvent { keyEvent ->
+                    if (keyEvent.key == Key.Enter) { //支持 desktop 回车事件
+                        auth()
+                    }
+                    keyEvent.key == Key.Enter
+                },
                 singleLine = true,
                 visualTransformation = PasswordVisualTransformation(),
                 label = { PasswordWidgetLabel(state) },
@@ -388,15 +408,7 @@ fun PasswordWidget(
                 },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
                 keyboardActions = KeyboardActions(onDone = {
-                    state = if (verifyPrivateKey(privateKey)) {
-                        coroutineScope.launch {
-                            delay(1000)
-                            password = computeCipher(privateKey)
-                        }
-                        1
-                    } else {
-                        -1
-                    }
+                    auth()
                 })
             )
         }
