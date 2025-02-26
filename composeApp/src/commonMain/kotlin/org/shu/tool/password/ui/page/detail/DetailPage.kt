@@ -79,7 +79,19 @@ fun DetailPage(
     modifier: Modifier = Modifier
 ) {
     //todo: 根据ID查询
-    val record:PasswordRecord? = obtainTestData()[0]
+    val record:PasswordRecord? = PasswordRecord(
+        id = 111L,
+        websiteLink = "https://www.baidu.com",
+        account = "shuouyang0@gmail.com",
+        accountType = PasswordRecord.ACCOUNT_TYPE_EMAIL,
+        passwordType = PasswordRecord.PASSWORD_TYPE_STRONG,
+        cipher = "12345678",
+        registerDate = TimeExt.now(),
+        //        nickname = "百度",
+        remark = "这是简单的备注，用于测试",
+        username = "shuouyang",
+        modifyDate =  TimeExt.now() + 20
+    )
     val scheme = MaterialTheme.colorScheme
     var websiteLink by remember { mutableStateOf(record?.websiteLink ?: "") }
     var account by remember { mutableStateOf(record?.account ?: "") }

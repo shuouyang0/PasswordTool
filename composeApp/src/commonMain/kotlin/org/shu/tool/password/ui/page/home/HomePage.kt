@@ -22,6 +22,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.GenericShape
 import androidx.compose.foundation.shape.ZeroCornerSize
 import androidx.compose.foundation.text.KeyboardActions
@@ -68,9 +69,9 @@ import androidx.compose.ui.unit.sp
 import androidx.paging.PagingData
 import coil3.compose.AsyncImage
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
-import kotlinx.datetime.Clock
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
@@ -91,8 +92,8 @@ import passwordtool.composeapp.generated.resources.ic_website
 import passwordtool.composeapp.generated.resources.input_private_key_tip
 import passwordtool.composeapp.generated.resources.look_up
 import passwordtool.composeapp.generated.resources.pass
-
-fun obtainTestData(): List<PasswordRecord> {
+@Composable
+fun obtainTestData(): LazyPagingItems<PasswordRecord> {
     val testData = mutableListOf<PasswordRecord>()
     repeat(20){idx ->
         testData.add(
@@ -111,21 +112,22 @@ fun obtainTestData(): List<PasswordRecord> {
             )
         )
     }
-    return testData
+    val page = PagingData.from(testData)
+    return flow { emit(page) }.collectAsLazyPagingItems()
 }
+
 @Composable
 fun HomePage(
     navToDetail: (PasswordRecord?) -> Unit = {}
 ) {
     val scheme = MaterialTheme.colorScheme
-    val viewModel = koinViewModel<HomeViewModel>()
+//    val viewModel = koinViewModel<HomeViewModel>()
     //    var pager by remember { mutableStateOf(viewModel.obtainAllRecord()) }
     //    val items = pager.flow.collectAsLazyPagingItems()
-    val testData = PagingData.from(obtainTestData())
-    val flow = flow { emit(testData)  }
+
     Column(modifier = Modifier.fillMaxSize().background(scheme.background)) {
         PasswordRecordList(
-            items = flow.collectAsLazyPagingItems(),
+            items = obtainTestData(),
             onDeleteRecord = {  },
             onEditRecord = { navToDetail(it) },
             modifier = Modifier.fillMaxWidth().weight(1f).background(scheme.onBackground)
@@ -140,12 +142,13 @@ fun HomePage(
 
 @Composable
 fun PasswordRecordList(
-    items: LazyPagingItems<PasswordRecord>,
+    items: LazyPagingItems<PasswordRecord> = obtainTestData(),
     onDeleteRecord: (PasswordRecord) -> Unit = {},
     onEditRecord: (PasswordRecord) -> Unit = {},
     modifier: Modifier = Modifier,
 ) {
-    LazyColumn(modifier = modifier) {
+    val state = rememberLazyListState()
+    LazyColumn(modifier = modifier, state = state) {
         items(
             count = items.itemCount,
             key = { index -> items[index]?.id.toString() }

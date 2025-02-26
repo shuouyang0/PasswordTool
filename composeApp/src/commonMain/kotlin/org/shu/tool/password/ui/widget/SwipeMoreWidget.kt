@@ -2,11 +2,7 @@ package org.shu.tool.password.ui.widget
 
 
 import androidx.compose.animation.core.Animatable
-import androidx.compose.foundation.background
-import androidx.compose.foundation.gestures.detectDragGestures
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -14,10 +10,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.Layout
-import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
 import kotlin.math.absoluteValue
 
@@ -38,12 +32,12 @@ fun SwipeMoreWidget(
     Layout(
         modifier = modifier
             .pointerInput(Unit) {
-                detectDragGestures(
+                detectHorizontalDragGestures(
                     onDragEnd = { dragEnd() },
                     onDragCancel = { dragEnd() },
-                    onDrag = { _, dragAmount ->
+                    onHorizontalDrag  = { change, dragAmount ->
                         val range = if (rtl) -maxOffset..0 else 0..maxOffset
-                        val newOffset = (dragAmount.x + offset.value).coerceIn(range.first.toFloat(),range.last.toFloat())
+                        val newOffset = (dragAmount + offset.value).coerceIn(range.first.toFloat(),range.last.toFloat())
                         cs.launch { offset.snapTo(newOffset) }
                     }
                 )
