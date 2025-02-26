@@ -91,4 +91,12 @@ data class PasswordRecord(
     fun obtainWebsiteUrl():Url{
         return Url(websiteLink)
     }
+
+    fun obtainTitle():String{
+        return if (nickname.isBlank())
+            websiteLink
+        else
+            "$nickname | $websiteLink"
+
+    }
 }

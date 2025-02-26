@@ -1,4 +1,19 @@
 <resources>
     <string name="app_name">PasswordTool</string>
     <string name="account_s">账号：%s</string>
+    <string name="look_up">查找</string>
+    <string name="delete">删除</string>
+    <string name="pass">PASS</string>
+    <string name="error">ERROR</string>
+    <string name="input_private_key_tip">INPUT PRIVATE KEY</string>
+    <string name="weblink">WEBLINK | 网站链接</string>
+    <string name="private_key">PRIVATE_KEY | 私钥</string>
+    <string name="account">ACCOUNT | 账号</string>
+    <string name="more">更多</string>
+    <string name="username">USERNAME | 用户名</string>
+    <string name="nickname">NICKNAME | 别名</string>
+    <string name="remark">REMARK | 备注</string>
+    <string name="complete">完成</string>
+    <string name="edit">编辑</string>
+    <string name="new">添加</string>
 </resources>

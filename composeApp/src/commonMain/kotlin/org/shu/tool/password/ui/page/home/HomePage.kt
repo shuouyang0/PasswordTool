@@ -72,17 +72,25 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
 import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.koin.compose.viewmodel.koinViewModel
 import org.shu.keytool.base.algorithm.EncryptionAlgorithm
 import org.shu.tool.password.base.module.PasswordRecord
 import org.shu.tool.password.ui.widget.SwipeMoreWidget
 import org.shu.tool.password.util.LazyPagingItems
+import org.shu.tool.password.util.TimeExt
 import org.shu.tool.password.util.collectAsLazyPagingItems
 import org.shu.tool.password.util.to_SHA256_BASE64
 import passwordtool.composeapp.generated.resources.Res
+import passwordtool.composeapp.generated.resources.account_s
+import passwordtool.composeapp.generated.resources.delete
+import passwordtool.composeapp.generated.resources.error
 import passwordtool.composeapp.generated.resources.ic_next
 import passwordtool.composeapp.generated.resources.ic_website
+import passwordtool.composeapp.generated.resources.input_private_key_tip
+import passwordtool.composeapp.generated.resources.look_up
+import passwordtool.composeapp.generated.resources.pass
 
 fun obtainTestData(): List<PasswordRecord> {
     val testData = mutableListOf<PasswordRecord>()
@@ -94,51 +102,47 @@ fun obtainTestData(): List<PasswordRecord> {
                 account = "shuouyang0@gmail.com",
                 accountType = PasswordRecord.ACCOUNT_TYPE_EMAIL,
                 passwordType = PasswordRecord.PASSWORD_TYPE_STRONG,
-                cipher = "jlksjflkasjflj",
-                registerDate = Clock.System.now().toEpochMilliseconds(),
+                cipher = "12345678",
+                registerDate = TimeExt.now(),
                 //        nickname = "百度",
                 remark = "这是简单的备注，用于测试",
                 username = "shuouyang",
-                modifyDate =  Clock.System.now().toEpochMilliseconds() + 20
+                modifyDate =  TimeExt.now() + 20
             )
         )
     }
     return testData
 }
 @Composable
-fun HomePage() {
-    val viewModel = koinViewModel<HomeViewModel>()
-//    var pager by remember { mutableStateOf(viewModel.obtainAllRecord()) }
-//    val items = pager.flow.collectAsLazyPagingItems()
-    val testData = PagingData.from(obtainTestData())
-    val flow = flow { emit(testData)  }
-    Home(
-        items = flow.collectAsLazyPagingItems()
-    )
-}
-
-@Preview
-@Composable
-fun Home(
-    items: LazyPagingItems<PasswordRecord>,
-    modifier: Modifier = Modifier
+fun HomePage(
+    navToDetail: (PasswordRecord?) -> Unit = {}
 ) {
     val scheme = MaterialTheme.colorScheme
-    Column(modifier = modifier.fillMaxSize().background(scheme.background)) {
+    val viewModel = koinViewModel<HomeViewModel>()
+    //    var pager by remember { mutableStateOf(viewModel.obtainAllRecord()) }
+    //    val items = pager.flow.collectAsLazyPagingItems()
+    val testData = PagingData.from(obtainTestData())
+    val flow = flow { emit(testData)  }
+    Column(modifier = Modifier.fillMaxSize().background(scheme.background)) {
         PasswordRecordList(
-            items = items,
+            items = flow.collectAsLazyPagingItems(),
+            onDeleteRecord = {  },
+            onEditRecord = { navToDetail(it) },
             modifier = Modifier.fillMaxWidth().weight(1f).background(scheme.onBackground)
         )
         SearchBar(
-            modifier = Modifier.fillMaxWidth().height(60.dp)
-                .background(MaterialTheme.colorScheme.secondaryContainer)
+            onAddRecord = { navToDetail(null) },
+            modifier = Modifier.fillMaxWidth().height(60.dp).background(scheme.secondaryContainer)
         )
     }
 }
 
+
 @Composable
 fun PasswordRecordList(
     items: LazyPagingItems<PasswordRecord>,
+    onDeleteRecord: (PasswordRecord) -> Unit = {},
+    onEditRecord: (PasswordRecord) -> Unit = {},
     modifier: Modifier = Modifier,
 ) {
     LazyColumn(modifier = modifier) {
@@ -146,29 +150,30 @@ fun PasswordRecordList(
             count = items.itemCount,
             key = { index -> items[index]?.id.toString() }
         ) { index ->
-            println("SHUOUYANG ----> $index" )
             val record = items[index]
             if (record != null) {
-                PasswordRecordItem(record = record)
+                PasswordRecordItem(
+                    record = record,
+                    onDeleteRecord = onDeleteRecord,
+                    onEditRecord = onEditRecord
+                )
             }
         }
     }
 }
+
 @Preview
 @Composable
 fun SearchBar(
+    value: String = "",
+    onValueChange: (String) -> Unit = {},
+    onAddRecord: () -> Unit = {},
     modifier: Modifier = Modifier,
-    onSearch: (String) -> Unit = {},
-    onAdd: () -> Unit = {}
 ) {
-    var searchText by remember { mutableStateOf("") }
     TextField(
         modifier = modifier,
-        value = searchText,
-        onValueChange = {
-            searchText = it
-            onSearch(it)
-        },
+        value = value,
+        onValueChange = onValueChange,
         colors = TextFieldDefaults.colors().copy(
             focusedContainerColor = MaterialTheme.colorScheme.onSecondaryContainer,
             focusedTextColor = MaterialTheme.colorScheme.secondary,
@@ -176,7 +181,7 @@ fun SearchBar(
         ),
         singleLine = true,
         textStyle = TextStyle(fontSize = 12.sp),
-        placeholder = { Text("查找", fontSize = 12.sp) },
+        placeholder = { Text(stringResource(Res.string.look_up), fontSize = 12.sp) },
         shape = MaterialTheme.shapes.small.copy(
             topStart = ZeroCornerSize,
             topEnd = ZeroCornerSize,
@@ -198,7 +203,7 @@ fun SearchBar(
                 modifier = Modifier
                     .size(40.dp)
                     .background(MaterialTheme.colorScheme.onPrimaryContainer)
-                    .clickable { onAdd() }
+                    .clickable { onAddRecord() }
             )
         },
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
@@ -210,6 +215,7 @@ fun SearchBar(
 fun PasswordRecordItem(
     record: PasswordRecord,
     onDeleteRecord: (PasswordRecord) -> Unit = {},
+    onEditRecord: (PasswordRecord) -> Unit = {},
 ) {
     var export by remember { mutableStateOf(false) }
     val radio = remember { Animatable(0f) }
@@ -217,21 +223,21 @@ fun PasswordRecordItem(
     SwipeMoreWidget(
         rtl = false,
         content = {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .wrapContentHeight()
-                    .pointerInput(Unit) {
-                        detectTapGestures(
-                            onTap = {
-                                export = !export
-                                coroutineScope.launch {
-                                    radio.animateTo(if (export) 90f else 0f)
-                                }
+            Column(modifier = Modifier
+                .fillMaxWidth()
+                .wrapContentHeight()
+                .pointerInput(Unit) {
+                    detectTapGestures(
+                        onLongPress = { onEditRecord(record) },
+                        onTap = {
+                            export = !export
+                            coroutineScope.launch {
+                                radio.animateTo(if (export) 90f else 0f)
                             }
-                        )
-                    }
-                    .background(MaterialTheme.colorScheme.secondaryContainer)
+                        }
+                    )
+                }
+                .background(MaterialTheme.colorScheme.secondaryContainer)
             ) {
                 KeyRecordDefaultItem(record, radio)
                 AnimatedVisibility(export) {
@@ -254,15 +260,13 @@ fun PasswordRecordItem(
         },
         more = {
             Text(
-                text = "删除",
+                text = stringResource(Res.string.delete),
                 textAlign = TextAlign.Center,
                 fontSize = 14.sp, color = MaterialTheme.colorScheme.onPrimary,
                 modifier = Modifier
                     .fillMaxHeight()
                     .width(60.dp)
-                    .clickable {
-                        onDeleteRecord(record)
-                    }
+                    .clickable { onDeleteRecord(record) }
                     .background(Color.Red)
                     .wrapContentSize(Alignment.Center)
             )
@@ -270,6 +274,7 @@ fun PasswordRecordItem(
     )
 
 }
+
 @Preview
 @Composable
 fun KeyRecordDefaultItem(
@@ -290,7 +295,7 @@ fun KeyRecordDefaultItem(
             placeholder = painterResource(Res.drawable.ic_website)
         )
         Text(
-            text = record.nickname + " | " + record.websiteLink,
+            text = record.obtainTitle(),
             modifier = Modifier
                 .padding(horizontal = 20.dp)
                 .weight(1f),
@@ -307,6 +312,7 @@ fun KeyRecordDefaultItem(
         )
     }
 }
+
 @Preview
 @Composable
 fun KeyRecordExportItem(record: PasswordRecord, modifier: Modifier = Modifier) {
@@ -323,7 +329,7 @@ fun KeyRecordExportItem(record: PasswordRecord, modifier: Modifier = Modifier) {
         }
         Text(
             modifier = Modifier.fillMaxWidth(),
-            text = "账号：${record.account}",
+            text = stringResource(Res.string.account_s,record.account),
             fontSize = 14.sp,
             color = MaterialTheme.colorScheme.secondary
         )
@@ -345,14 +351,17 @@ fun PasswordWidget(
     verifyPrivateKey: (String) -> Boolean = { false },
     computeCipher: (String) -> String = { "" },
 ) {
-    var state by remember { mutableIntStateOf(0) } //0-初始态，1-私钥验证通过, -1 私钥校验失败，2
-    var privateKey by rememberSaveable { mutableStateOf("") }
-    var password by rememberSaveable { mutableStateOf("") }
+    var state by remember { mutableIntStateOf(0) } // 0-初始态，1-私钥验证通过, -1 私钥校验失败，2
     var width by remember { mutableIntStateOf(0) }
-    val privateKeyCap = width / (privateKey.length + 1) / 4
-    val passwordCap = width / (password.length + 1) / 8
     val coroutineScope = rememberCoroutineScope()
     val clipboardManager = LocalClipboardManager.current
+
+    var privateKey by rememberSaveable { mutableStateOf("") }
+    var password by rememberSaveable { mutableStateOf("") }
+
+    val privateKeyCap = width / (privateKey.length + 1) / 4
+    val passwordCap = width / (password.length + 1) / 8
+
     Box(
         modifier = modifier.onSizeChanged { width = it.width },
         contentAlignment = Alignment.Center // 设置内容居中对齐
@@ -428,9 +437,9 @@ fun PasswordWidget(
 fun PasswordWidgetLabel(state: Int) {
     Text(
         text = when (state) {
-            1 -> "PASS"
-            -1 -> "ERROR"
-            else -> "INPUT PRIVATE KEY"
+            1 -> stringResource(Res.string.pass)
+            -1 -> stringResource(Res.string.error)
+            else -> stringResource(Res.string.input_private_key_tip)
         }, textAlign = TextAlign.Center, fontSize = 10.sp
     )
 }
