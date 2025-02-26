@@ -112,7 +112,7 @@ fun DetailPage(
             viewModel.insertRecord(newRecord)
             onBack()
         })
-
+        HorizontalDivider(color = MaterialTheme.colorScheme.onBackground)
         val editModifier =
             Modifier.fillMaxWidth().padding(horizontal = 10.dp, vertical = 6.dp).height(60.dp)
 
@@ -217,11 +217,11 @@ fun PageTitleBar(
         Image(painter = painterResource(Res.drawable.ic_back),
             contentDescription = "back",
             colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onPrimaryContainer),
-            modifier = Modifier.size(height).padding(14.dp).clickable { onBack() })
+            modifier = Modifier.size(height).clickable { onBack() }.padding(20.dp))
         Text(
             text = title,
             textAlign = TextAlign.Center,
-            fontSize = 24.sp,
+            fontSize = 20.sp,
             color = MaterialTheme.colorScheme.primary,
             modifier = Modifier.weight(1f).fillMaxHeight()
                 .wrapContentHeight(Alignment.CenterVertically) // 文字垂直居中
@@ -229,7 +229,7 @@ fun PageTitleBar(
         )
         Text(text = stringResource(Res.string.complete),
             textAlign = TextAlign.Center,
-            fontSize = 20.sp,
+            fontSize = 16.sp,
             color = MaterialTheme.colorScheme.onPrimaryContainer,
             modifier = Modifier.size(height).wrapContentHeight(Alignment.CenterVertically)
                 .clickable { onComplete() })
