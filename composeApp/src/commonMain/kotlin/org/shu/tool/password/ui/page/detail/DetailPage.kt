@@ -15,7 +15,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.GenericShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
@@ -42,11 +41,13 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
+import org.koin.compose.viewmodel.koinViewModel
 import org.shu.tool.password.base.module.PasswordRecord
-import org.shu.tool.password.ui.page.home.obtainTestData
+import org.shu.tool.password.util.Log
 import org.shu.tool.password.util.TimeExt
 import org.shu.tool.password.util.isEmail
 import org.shu.tool.password.util.isPhoneNumber
@@ -74,36 +75,25 @@ import passwordtool.composeapp.generated.resources.new
 @Composable
 fun DetailPage(
     recordId: Long? = null, //null-表示添加模式，notnull-表示编辑模式
-    onBack: () -> Unit = {},
-    onComplete: (PasswordRecord) -> Unit = {},
-    modifier: Modifier = Modifier
+    onBack: () -> Unit = {}, modifier: Modifier = Modifier
 ) {
-    //todo: 根据ID查询
-    val record:PasswordRecord? = PasswordRecord(
-        id = 111L,
-        websiteLink = "https://www.baidu.com",
-        account = "shuouyang0@gmail.com",
-        accountType = PasswordRecord.ACCOUNT_TYPE_EMAIL,
-        passwordType = PasswordRecord.PASSWORD_TYPE_STRONG,
-        cipher = "12345678",
-        registerDate = TimeExt.now(),
-        //        nickname = "百度",
-        remark = "这是简单的备注，用于测试",
-        username = "shuouyang",
-        modifyDate =  TimeExt.now() + 20
-    )
+    val viewModel = koinViewModel<DetailViewModel>()
+    viewModel.obtainRecordById(recordId)
+    val record by viewModel.pageRecord.collectAsStateWithLifecycle()
+    Log.d("DetailPage", "$recordId $record")
     val scheme = MaterialTheme.colorScheme
-    var websiteLink by remember { mutableStateOf(record?.websiteLink ?: "") }
-    var account by remember { mutableStateOf(record?.account ?: "") }
-    var privateKey by remember { mutableStateOf("") }
-    var username by remember { mutableStateOf(record?.username ?: "") }
-    var nickname by remember { mutableStateOf(record?.nickname ?: "") }
-    var remark by remember { mutableStateOf(record?.remark ?: "") }
-    var passwordType by remember { mutableIntStateOf(0) }
+    var websiteLink by remember(record) { mutableStateOf(record?.websiteLink ?: "") }
+    var account by remember(record) { mutableStateOf(record?.account ?: "") }
+    var privateKey by remember(record) { mutableStateOf("") }
+    var username by remember(record) { mutableStateOf(record?.username ?: "") }
+    var nickname by remember(record) { mutableStateOf(record?.nickname ?: "") }
+    var remark by remember(record) { mutableStateOf(record?.remark ?: "") }
+    var passwordType by remember(record) { mutableIntStateOf(0) }
 
     Column(modifier = modifier.fillMaxSize().background(scheme.background)) {
 
-        val title = if (record == null) stringResource(Res.string.new) else stringResource(Res.string.edit)
+        val title =
+            if (record == null) stringResource(Res.string.new) else stringResource(Res.string.edit)
 
         PageTitleBar(title = title, onBack = onBack, onComplete = {
             val newRecord = PasswordRecord(
@@ -113,16 +103,18 @@ fun DetailPage(
                 passwordType = passwordType,
                 cipher = record?.cipher ?: privateKey.to_SHA256_BASE64(),
                 username = username,
-                nickname = username,
+                nickname = nickname,
                 remark = remark,
                 registerDate = record?.registerDate ?: TimeExt.now(),
-                modifyDate = if(record == null) -1 else  TimeExt.now(),
+                modifyDate = if (record == null) -1 else TimeExt.now(),
                 id = record?.id,
             )
-            onComplete(newRecord)
+            viewModel.insertRecord(newRecord)
+            onBack()
         })
 
-        val editModifier = Modifier.fillMaxWidth().padding(horizontal = 10.dp, vertical = 6.dp).height(60.dp)
+        val editModifier =
+            Modifier.fillMaxWidth().padding(horizontal = 10.dp, vertical = 6.dp).height(60.dp)
 
         EditPasswordRecordProperty(
             value = websiteLink,
@@ -133,8 +125,7 @@ fun DetailPage(
             },
             onValueChange = { websiteLink = it },
             onVerify = { it.isURL() },
-            modifier = Modifier
-                .then(editModifier)
+            modifier = Modifier.then(editModifier)
         )
 
         if (record == null) {
@@ -144,10 +135,8 @@ fun DetailPage(
                 painter = painterResource(Res.drawable.ic_private_key),
                 trailingIcon = {
                     Box(
-                        modifier = Modifier
-                            .fillMaxHeight()
-                            .clickable { passwordType = (passwordType + 1) % 2 }
-                            .padding(10.dp)
+                        modifier = Modifier.fillMaxHeight()
+                            .clickable { passwordType = (passwordType + 1) % 2 }.padding(10.dp)
                             .background(if (passwordType == 0) Color.Red else Color.Green),
                     )
                 },
@@ -170,8 +159,7 @@ fun DetailPage(
             },
             onValueChange = { account = it },
             onVerify = { it.isEmail() || it.isPhoneNumber() },
-            modifier = Modifier
-                .then(editModifier)
+            modifier = Modifier.then(editModifier)
         )
 
         var export by remember { mutableStateOf(true) }
@@ -180,14 +168,11 @@ fun DetailPage(
             label = stringResource(Res.string.more),
             export = export,
             onExport = { export = it },
-            modifier = Modifier
-                .padding(vertical = 6.dp)
-                .fillMaxWidth()
-                .wrapContentHeight()
+            modifier = Modifier.padding(vertical = 6.dp).fillMaxWidth().wrapContentHeight()
         )
 
         AnimatedVisibility(visible = export) {
-            Column{
+            Column {
                 Row(
                     modifier = Modifier.then(editModifier),
                 ) {
@@ -195,17 +180,14 @@ fun DetailPage(
                         value = username,
                         label = stringResource(Res.string.username),
                         onValueChange = { username = it },
-                        modifier = Modifier
-                            .weight(1f)
+                        modifier = Modifier.weight(1f)
                     )
 
                     EditPasswordRecordExtProperty(
                         value = nickname,
                         label = stringResource(Res.string.nickname),
                         onValueChange = { nickname = it },
-                        modifier = Modifier
-                            .fillMaxHeight()
-                            .weight(1f)
+                        modifier = Modifier.fillMaxHeight().weight(1f)
                     )
                 }
 
@@ -214,7 +196,8 @@ fun DetailPage(
                     label = stringResource(Res.string.remark),
                     singleLine = false,
                     onValueChange = { remark = it },
-                    modifier = Modifier.fillMaxWidth().padding(horizontal = 10.dp, vertical = 6.dp).fillMaxHeight(),
+                    modifier = Modifier.fillMaxWidth().padding(horizontal = 10.dp, vertical = 6.dp)
+                        .fillMaxHeight(),
                 )
             }
         }
@@ -231,24 +214,20 @@ fun PageTitleBar(
 ) {
     val height = 60.dp
     Row(modifier = modifier.fillMaxWidth().height(height)) {
-        Image(
-            painter = painterResource(Res.drawable.ic_back),
+        Image(painter = painterResource(Res.drawable.ic_back),
             contentDescription = "back",
             colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onPrimaryContainer),
-            modifier = Modifier.size(height).padding(14.dp).clickable { onBack() }
-        )
+            modifier = Modifier.size(height).padding(14.dp).clickable { onBack() })
         Text(
             text = title,
             textAlign = TextAlign.Center,
             fontSize = 24.sp,
             color = MaterialTheme.colorScheme.primary,
-            modifier = Modifier.weight(1f)
-                .fillMaxHeight()
+            modifier = Modifier.weight(1f).fillMaxHeight()
                 .wrapContentHeight(Alignment.CenterVertically) // 文字垂直居中
 
         )
-        Text(
-            text = stringResource(Res.string.complete),
+        Text(text = stringResource(Res.string.complete),
             textAlign = TextAlign.Center,
             fontSize = 20.sp,
             color = MaterialTheme.colorScheme.onPrimaryContainer,
@@ -263,9 +242,7 @@ fun TrailingIcon(icon: DrawableResource, modifier: Modifier = Modifier) {
         painter = painterResource(icon),
         contentDescription = "",
         colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.secondary),
-        modifier = modifier
-            .fillMaxHeight()
-            .padding(10.dp),
+        modifier = modifier.fillMaxHeight().padding(10.dp),
     )
 }
 
@@ -280,48 +257,35 @@ fun EditPasswordRecordProperty(
     modifier: Modifier = Modifier
 ) {
     var pass by remember { mutableStateOf(true) }
-    OutlinedTextField(
-        value = value,
-        label = {
-            Text(
-                text = label, fontSize = 10.sp, color = MaterialTheme.colorScheme.secondary
-            )
-        },
-        onValueChange = {
-            onValueChange(it)
-            pass = onVerify(it)
-        },
-        singleLine = true,
-        isError = !pass,
-        leadingIcon = {
-            Image(
-                painter = painter,
-                contentDescription = "",
-                colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.secondary),
-                modifier = Modifier
-                    .fillMaxHeight()
-                    .padding(10.dp),
-            )
-        },
-        trailingIcon = trailingIcon,
-        textStyle = TextStyle(
-            fontSize = 14.sp,
-            textAlign = TextAlign.Start,
-            color = MaterialTheme.colorScheme.onSecondary,
-        ),
-        colors = OutlinedTextFieldDefaults.colors().copy(
-            errorLabelColor = MaterialTheme.colorScheme.error,
-            unfocusedLabelColor = MaterialTheme.colorScheme.secondary,
-            focusedLabelColor = MaterialTheme.colorScheme.onSecondary,
-            disabledLabelColor = MaterialTheme.colorScheme.secondary
-        ),
-        shape = GenericShape { size, _ ->
-            moveTo(0f, 0f)
-            lineTo(size.width, 0f)
-            lineTo(size.width, size.height)
-            lineTo(0f, size.height)
-        },
-        modifier = modifier
+    OutlinedTextField(value = value, label = {
+        Text(
+            text = label, fontSize = 10.sp, color = MaterialTheme.colorScheme.secondary
+        )
+    }, onValueChange = {
+        onValueChange(it)
+        pass = onVerify(it)
+    }, singleLine = true, isError = !pass, leadingIcon = {
+        Image(
+            painter = painter,
+            contentDescription = "",
+            colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.secondary),
+            modifier = Modifier.fillMaxHeight().padding(10.dp),
+        )
+    }, trailingIcon = trailingIcon, textStyle = TextStyle(
+        fontSize = 14.sp,
+        textAlign = TextAlign.Start,
+        color = MaterialTheme.colorScheme.onSecondary,
+    ), colors = OutlinedTextFieldDefaults.colors().copy(
+        errorLabelColor = MaterialTheme.colorScheme.error,
+        unfocusedLabelColor = MaterialTheme.colorScheme.secondary,
+        focusedLabelColor = MaterialTheme.colorScheme.onSecondary,
+        disabledLabelColor = MaterialTheme.colorScheme.secondary
+    ), shape = GenericShape { size, _ ->
+        moveTo(0f, 0f)
+        lineTo(size.width, 0f)
+        lineTo(size.width, size.height)
+        lineTo(0f, size.height)
+    }, modifier = modifier
     )
 }
 
@@ -333,35 +297,25 @@ fun EditPasswordRecordExtProperty(
     singleLine: Boolean = true,
     modifier: Modifier = Modifier
 ) {
-    OutlinedTextField(
-        value = value,
-        label = {
-            Text(
-                text = label,
-                fontSize = 10.sp,
-                color = MaterialTheme.colorScheme.secondary
-            )
-        },
-        onValueChange = { onValueChange(it) },
-        singleLine = singleLine,
-        textStyle = TextStyle(
-            fontSize = 14.sp,
-            textAlign = TextAlign.Start,
-            color = MaterialTheme.colorScheme.onSecondary,
-        ),
-        colors = OutlinedTextFieldDefaults.colors().copy(
-            errorLabelColor = MaterialTheme.colorScheme.error,
-            unfocusedLabelColor = MaterialTheme.colorScheme.secondary,
-            focusedLabelColor = MaterialTheme.colorScheme.onSecondary,
-            disabledLabelColor = MaterialTheme.colorScheme.secondary
-        ),
-        shape = GenericShape { size, _ ->
-            moveTo(0f, 0f)
-            lineTo(size.width, 0f)
-            lineTo(size.width, size.height)
-            lineTo(0f, size.height)
-        },
-        modifier = modifier
+    OutlinedTextField(value = value, label = {
+        Text(
+            text = label, fontSize = 10.sp, color = MaterialTheme.colorScheme.secondary
+        )
+    }, onValueChange = { onValueChange(it) }, singleLine = singleLine, textStyle = TextStyle(
+        fontSize = 14.sp,
+        textAlign = TextAlign.Start,
+        color = MaterialTheme.colorScheme.onSecondary,
+    ), colors = OutlinedTextFieldDefaults.colors().copy(
+        errorLabelColor = MaterialTheme.colorScheme.error,
+        unfocusedLabelColor = MaterialTheme.colorScheme.secondary,
+        focusedLabelColor = MaterialTheme.colorScheme.onSecondary,
+        disabledLabelColor = MaterialTheme.colorScheme.secondary
+    ), shape = GenericShape { size, _ ->
+        moveTo(0f, 0f)
+        lineTo(size.width, 0f)
+        lineTo(size.width, size.height)
+        lineTo(0f, size.height)
+    }, modifier = modifier
     )
 }
 
@@ -384,9 +338,7 @@ fun DividerExportWidget(
     }
     Column(modifier = modifier.padding(start = 10.dp)) {
         Box(contentAlignment = Alignment.Center,
-            modifier = Modifier
-                .fillMaxWidth()
-                .wrapContentHeight()
+            modifier = Modifier.fillMaxWidth().wrapContentHeight()
                 .clickable { onExport(!export) }) {
             HorizontalDivider(
                 color = MaterialTheme.colorScheme.onSurface,
@@ -400,11 +352,8 @@ fun DividerExportWidget(
             Icon(
                 imageVector = Icons.AutoMirrored.Filled.KeyboardArrowLeft,
                 tint = MaterialTheme.colorScheme.onSurface,
-                modifier = Modifier
-                    .size(30.dp)
-                    .background(MaterialTheme.colorScheme.background)
-                    .align(Alignment.CenterEnd)
-                    .rotate(radio.value),
+                modifier = Modifier.size(30.dp).background(MaterialTheme.colorScheme.background)
+                    .align(Alignment.CenterEnd).rotate(radio.value),
                 contentDescription = ""
             )
         }

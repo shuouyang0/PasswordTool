@@ -1,13 +1,14 @@
 package org.shu.keytool.base.algorithm
 
-import java.net.URL
+import io.ktor.http.Url
+
 
 class PeanutEncryptionAlgorithm:IEncryptionAlgorithm{
     override fun encrypt(websiteUrl: String, privateKey: String): String {
         val password = StringBuilder()
         password.append(privateKey)
 
-        val host = URL(websiteUrl).host
+        val host = Url(websiteUrl).host
         if (host.isNotBlank()){
             val domain = host.split('.')
             var number = 0

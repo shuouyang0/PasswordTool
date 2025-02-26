@@ -15,25 +15,25 @@ import org.shu.tool.password.base.module.PasswordRecord
 interface PasswordRecordDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insert(record: PasswordRecord)
+    suspend fun insert(keyRecord: PasswordRecord)
 
     @Update
-    suspend fun update(record: PasswordRecord)
+    suspend fun update(keyRecord: PasswordRecord)
 
     @Upsert
-    suspend fun upsert(record: PasswordRecord)
+    suspend fun upsert(keyRecord: PasswordRecord)
 
     @Delete
-    suspend fun delete(record: PasswordRecord)
+    suspend fun delete(keyRecord: PasswordRecord)
 
     @Query("SELECT * FROM password_record WHERE id = :id")
-    suspend fun getRecordById(id: String): PasswordRecord?
+    suspend fun getRecordById(id: Long): PasswordRecord?
 
     @Query("""
         SELECT * FROM password_record
         ORDER BY COALESCE(modifyDate, registerDate) DESC
     """)
-    suspend fun getPasswordRecords(): List<PasswordRecord>
+    fun getKeyRecords(): PagingSource<Int, PasswordRecord>
 
     @Transaction
     @Query("SELECT * FROM password_record WHERE " +
@@ -42,5 +42,5 @@ interface PasswordRecordDao {
             "nickname LIKE :key OR " +
             "username LIKE :key OR " +
             "remark LIKE :key")
-    suspend fun getPasswordRecordsByKeyword(key: String):List<PasswordRecord>
+    fun getKeyRecordsByKeyword(key: String): PagingSource<Int, PasswordRecord>
 }

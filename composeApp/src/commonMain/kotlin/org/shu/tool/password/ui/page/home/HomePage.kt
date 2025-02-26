@@ -69,7 +69,6 @@ import androidx.compose.ui.unit.sp
 import androidx.paging.PagingData
 import coil3.compose.AsyncImage
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.painterResource
@@ -80,6 +79,7 @@ import org.shu.keytool.base.algorithm.EncryptionAlgorithm
 import org.shu.tool.password.base.module.PasswordRecord
 import org.shu.tool.password.ui.widget.SwipeMoreWidget
 import org.shu.tool.password.util.LazyPagingItems
+import org.shu.tool.password.util.Log
 import org.shu.tool.password.util.TimeExt
 import org.shu.tool.password.util.collectAsLazyPagingItems
 import org.shu.tool.password.util.to_SHA256_BASE64
@@ -92,10 +92,11 @@ import passwordtool.composeapp.generated.resources.ic_website
 import passwordtool.composeapp.generated.resources.input_private_key_tip
 import passwordtool.composeapp.generated.resources.look_up
 import passwordtool.composeapp.generated.resources.pass
+
 @Composable
 fun obtainTestData(): LazyPagingItems<PasswordRecord> {
     val testData = mutableListOf<PasswordRecord>()
-    repeat(20){idx ->
+    repeat(20) { idx ->
         testData.add(
             PasswordRecord(
                 id = idx.toLong(),
@@ -108,7 +109,7 @@ fun obtainTestData(): LazyPagingItems<PasswordRecord> {
                 //        nickname = "百度",
                 remark = "这是简单的备注，用于测试",
                 username = "shuouyang",
-                modifyDate =  TimeExt.now() + 20
+                modifyDate = TimeExt.now() + 20
             )
         )
     }
@@ -118,22 +119,25 @@ fun obtainTestData(): LazyPagingItems<PasswordRecord> {
 
 @Composable
 fun HomePage(
-    navToDetail: (PasswordRecord?) -> Unit = {}
+    navToDetail: (Long?) -> Unit = {}
 ) {
     val scheme = MaterialTheme.colorScheme
-//    val viewModel = koinViewModel<HomeViewModel>()
-    //    var pager by remember { mutableStateOf(viewModel.obtainAllRecord()) }
-    //    val items = pager.flow.collectAsLazyPagingItems()
+    val viewModel = koinViewModel<HomeViewModel>()
+    var pager by remember { mutableStateOf(viewModel.obtainAllRecord()) }
+    val items = pager.flow.collectAsLazyPagingItems()
 
     Column(modifier = Modifier.fillMaxSize().background(scheme.background)) {
         PasswordRecordList(
-            items = obtainTestData(),
-            onDeleteRecord = {  },
-            onEditRecord = { navToDetail(it) },
+            items = items,
+            onDeleteRecord = { viewModel.deleteRecord(it) },
+            onEditRecord = { navToDetail(it.id) },
             modifier = Modifier.fillMaxWidth().weight(1f).background(scheme.onBackground)
         )
         SearchBar(
-            onAddRecord = { navToDetail(null) },
+            onValueChange = {
+                pager = viewModel.searchRecord(it)
+            },
+            onAddRecord = { navToDetail(-1) },
             modifier = Modifier.fillMaxWidth().height(60.dp).background(scheme.secondaryContainer)
         )
     }
@@ -149,16 +153,12 @@ fun PasswordRecordList(
 ) {
     val state = rememberLazyListState()
     LazyColumn(modifier = modifier, state = state) {
-        items(
-            count = items.itemCount,
-            key = { index -> items[index]?.id.toString() }
-        ) { index ->
+        items(count = items.itemCount, key = { index -> items[index]?.id.toString() }) { index ->
             val record = items[index]
+            Log.d("HomePage --> ", record)
             if (record != null) {
                 PasswordRecordItem(
-                    record = record,
-                    onDeleteRecord = onDeleteRecord,
-                    onEditRecord = onEditRecord
+                    record = record, onDeleteRecord = onDeleteRecord, onEditRecord = onEditRecord
                 )
             }
         }
@@ -168,15 +168,19 @@ fun PasswordRecordList(
 @Preview
 @Composable
 fun SearchBar(
-    value: String = "",
     onValueChange: (String) -> Unit = {},
     onAddRecord: () -> Unit = {},
     modifier: Modifier = Modifier,
 ) {
+    var keyword by remember { mutableStateOf("") }
+
     TextField(
         modifier = modifier,
-        value = value,
-        onValueChange = onValueChange,
+        value = keyword,
+        onValueChange = {
+            keyword = it
+            onValueChange(it)
+        },
         colors = TextFieldDefaults.colors().copy(
             focusedContainerColor = MaterialTheme.colorScheme.onSecondaryContainer,
             focusedTextColor = MaterialTheme.colorScheme.secondary,
@@ -199,15 +203,12 @@ fun SearchBar(
             )
         },
         trailingIcon = {
-            Icon(
-                imageVector = Icons.Default.Add,
+            Icon(imageVector = Icons.Default.Add,
                 contentDescription = "",
                 tint = MaterialTheme.colorScheme.onPrimary,
-                modifier = Modifier
-                    .size(40.dp)
+                modifier = Modifier.size(40.dp)
                     .background(MaterialTheme.colorScheme.onPrimaryContainer)
-                    .clickable { onAddRecord() }
-            )
+                    .clickable { onAddRecord() })
         },
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
     )
@@ -223,71 +224,47 @@ fun PasswordRecordItem(
     var export by remember { mutableStateOf(false) }
     val radio = remember { Animatable(0f) }
     val coroutineScope = rememberCoroutineScope()
-    SwipeMoreWidget(
-        rtl = false,
-        content = {
-            Column(modifier = Modifier
-                .fillMaxWidth()
-                .wrapContentHeight()
-                .pointerInput(Unit) {
-                    detectTapGestures(
-                        onLongPress = { onEditRecord(record) },
-                        onTap = {
-                            export = !export
-                            coroutineScope.launch {
-                                radio.animateTo(if (export) 90f else 0f)
-                            }
-                        }
-                    )
+    SwipeMoreWidget(rtl = false, content = {
+        Column(modifier = Modifier.fillMaxWidth().wrapContentHeight().pointerInput(Unit) {
+            detectTapGestures(onLongPress = { onEditRecord(record) }, onTap = {
+                export = !export
+                coroutineScope.launch {
+                    radio.animateTo(if (export) 90f else 0f)
                 }
-                .background(MaterialTheme.colorScheme.secondaryContainer)
-            ) {
-                KeyRecordDefaultItem(record, radio)
-                AnimatedVisibility(export) {
-                    KeyRecordExportItem(
-                        record = record,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .wrapContentHeight()
-                            .padding(horizontal = 20.dp)
-                    )
-                }
-                HorizontalDivider(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(1.dp),
-                    thickness = 1.dp,
-                    color = MaterialTheme.colorScheme.background
+            })
+        }.background(MaterialTheme.colorScheme.secondaryContainer)) {
+            KeyRecordDefaultItem(record, radio)
+            AnimatedVisibility(export) {
+                KeyRecordExportItem(
+                    record = record,
+                    modifier = Modifier.fillMaxWidth().wrapContentHeight()
+                        .padding(horizontal = 20.dp)
                 )
             }
-        },
-        more = {
-            Text(
-                text = stringResource(Res.string.delete),
-                textAlign = TextAlign.Center,
-                fontSize = 14.sp, color = MaterialTheme.colorScheme.onPrimary,
-                modifier = Modifier
-                    .fillMaxHeight()
-                    .width(60.dp)
-                    .clickable { onDeleteRecord(record) }
-                    .background(Color.Red)
-                    .wrapContentSize(Alignment.Center)
+            HorizontalDivider(
+                modifier = Modifier.fillMaxWidth().height(1.dp),
+                thickness = 1.dp,
+                color = MaterialTheme.colorScheme.background
             )
         }
-    )
+    }, more = {
+        Text(text = stringResource(Res.string.delete),
+            textAlign = TextAlign.Center,
+            fontSize = 14.sp,
+            color = MaterialTheme.colorScheme.onPrimary,
+            modifier = Modifier.fillMaxHeight().width(60.dp).clickable { onDeleteRecord(record) }
+                .background(Color.Red).wrapContentSize(Alignment.Center))
+    })
 
 }
 
 @Preview
 @Composable
 fun KeyRecordDefaultItem(
-    record: PasswordRecord,
-    radio: Animatable<Float, AnimationVector1D>
+    record: PasswordRecord, radio: Animatable<Float, AnimationVector1D>
 ) {
     Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .wrapContentHeight()
+        modifier = Modifier.fillMaxWidth().wrapContentHeight()
             .padding(horizontal = 20.dp, vertical = 10.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -295,13 +272,12 @@ fun KeyRecordDefaultItem(
             model = record.obtainIconLink(),
             contentDescription = null,
             modifier = Modifier.size(20.dp),
-            placeholder = painterResource(Res.drawable.ic_website)
+            placeholder = painterResource(Res.drawable.ic_website),
+            error =  painterResource(Res.drawable.ic_website),
         )
         Text(
             text = record.obtainTitle(),
-            modifier = Modifier
-                .padding(horizontal = 20.dp)
-                .weight(1f),
+            modifier = Modifier.padding(horizontal = 20.dp).weight(1f),
             fontSize = 14.sp,
             color = MaterialTheme.colorScheme.secondary
         )
@@ -309,9 +285,7 @@ fun KeyRecordDefaultItem(
             contentDescription = null,
             painter = painterResource(Res.drawable.ic_next),
             colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.secondary),
-            modifier = Modifier
-                .size(10.dp)
-                .rotate(radio.value)
+            modifier = Modifier.size(10.dp).rotate(radio.value)
         )
     }
 }
@@ -322,27 +296,23 @@ fun KeyRecordExportItem(record: PasswordRecord, modifier: Modifier = Modifier) {
     Column(modifier = modifier) {
         if (record.remark.isNotBlank()) {
             Text(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .wrapContentHeight(),
+                modifier = Modifier.fillMaxWidth().wrapContentHeight(),
                 text = record.remark,
                 fontSize = 14.sp,
                 color = MaterialTheme.colorScheme.secondary
             )
         }
+        Log.d("KeyRecordExportItem", record.account)
         Text(
             modifier = Modifier.fillMaxWidth(),
-            text = stringResource(Res.string.account_s,record.account),
+            text = stringResource(Res.string.account_s) + record.account,
             fontSize = 14.sp,
             color = MaterialTheme.colorScheme.secondary
         )
         PasswordWidget(
             verifyPrivateKey = { it.to_SHA256_BASE64() == record.cipher },
             computeCipher = { EncryptionAlgorithm.encrypt(record.websiteLink, it) },
-            modifier = Modifier
-                .padding(vertical = 10.dp)
-                .fillMaxWidth()
-                .height(60.dp)
+            modifier = Modifier.padding(vertical = 10.dp).fillMaxWidth().height(60.dp)
         )
     }
 }
@@ -376,8 +346,7 @@ fun PasswordWidget(
                 maxLines = 1,
                 style = TextStyle(letterSpacing = passwordCap.sp),
                 fontSize = 14.sp,
-                modifier = Modifier
-                    .fillMaxSize()
+                modifier = Modifier.fillMaxSize()
                     .background(color = MaterialTheme.colorScheme.onSecondaryContainer)
                     .wrapContentSize(Alignment.Center),
                 color = MaterialTheme.colorScheme.onSecondary
@@ -477,32 +446,24 @@ fun DragBar(
             }
         }
     }
-    Canvas(modifier = modifier
-        .onSizeChanged {
-            containerWidth = it.width.toFloat()
-            containerHeight = it.height.toFloat()
-        }
-        .pointerInput(Unit) {
-            detectDragGestures(
-                onDragStart = {
-                    isDragging = it.x > 0 && it.x < containerHeight
-                },
-                onDragEnd = { dragEnd() },
-                onDragCancel = { dragEnd() },
-                onDrag = { _, dragAmount ->
-                    if (isDragging) {
-                        coroutineScope.launch {
-                            offsetX.snapTo(
-                                (offsetX.value + dragAmount.x).coerceIn(
-                                    0f,
-                                    containerWidth - containerHeight
-                                )
-                            )
-                        }
-                    }
+    Canvas(modifier = modifier.onSizeChanged {
+        containerWidth = it.width.toFloat()
+        containerHeight = it.height.toFloat()
+    }.pointerInput(Unit) {
+        detectDragGestures(onDragStart = {
+            isDragging = it.x > 0 && it.x < containerHeight
+        }, onDragEnd = { dragEnd() }, onDragCancel = { dragEnd() }, onDrag = { _, dragAmount ->
+            if (isDragging) {
+                coroutineScope.launch {
+                    offsetX.snapTo(
+                        (offsetX.value + dragAmount.x).coerceIn(
+                            0f, containerWidth - containerHeight
+                        )
+                    )
                 }
-            )
-        }) {
+            }
+        })
+    }) {
         drawRect(
             color = iconBgColor,
             topLeft = Offset(offsetX.value, 0f),
@@ -513,8 +474,7 @@ fun DragBar(
         translate(left = iconOffset + offsetX.value, top = iconOffset) {
             with(iconPainter) {
                 draw(
-                    size = Size(iconSize, iconSize),
-                    colorFilter = ColorFilter.tint(iconColor)
+                    size = Size(iconSize, iconSize), colorFilter = ColorFilter.tint(iconColor)
                 )
             }
         }

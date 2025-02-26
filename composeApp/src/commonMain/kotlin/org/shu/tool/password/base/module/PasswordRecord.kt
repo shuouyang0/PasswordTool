@@ -1,9 +1,11 @@
 package org.shu.tool.password.base.module
 
+import androidx.compose.runtime.Immutable
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import io.ktor.http.Url
 import kotlinx.serialization.Serializable
+import org.shu.tool.password.util.Log
 import org.shu.tool.password.util.isEmail
 import org.shu.tool.password.util.isPhoneNumber
 import org.shu.tool.password.util.maskEmail
@@ -12,6 +14,7 @@ import org.shu.tool.password.util.maskPhoneNumber
 //records
 @Entity("password_record")
 @Serializable
+@Immutable
 data class PasswordRecord(
     @PrimaryKey(autoGenerate = true)
     val id:Long? = null,
@@ -69,7 +72,8 @@ data class PasswordRecord(
         const val PASSWORD_TYPE_SIMPLE = 1
     }
     fun obtainIconLink():String{
-        return "$websiteLink/favicon.ico"
+        val host = Url(websiteLink).host
+        return "https://api.faviconkit.com/$host/64"
     }
 
     fun obtainAccountType():String{
