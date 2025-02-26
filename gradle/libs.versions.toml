@@ -70,7 +70,7 @@ di-koin-viewmodel-navigation = { module = "io.insert-koin:koin-compose-viewmodel
 di-koin-android = { module = "io.insert-koin:koin-android" }
 
 image-loader-coil = { group = "io.coil-kt.coil3", name = "coil-compose", version.ref = "coil" }
-image-loader-coil-network = { group = "io.coil-kt.coil3", name = "coil-network-okhttp", version.ref = "coil" }
+image-loader-coil-network = { group = "io.coil-kt.coil3", name = "coil-network-ktor3", version.ref = "coil" }
 
 encrypt-hash-sha2 = { group = "org.kotlincrypto.hash", name = "sha2", version = "0.6.1" }
 

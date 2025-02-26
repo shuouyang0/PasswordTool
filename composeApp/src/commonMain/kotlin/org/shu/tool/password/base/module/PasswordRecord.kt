@@ -73,7 +73,7 @@ data class PasswordRecord(
     }
     fun obtainIconLink():String{
         val host = Url(websiteLink).host
-        return "https://api.faviconkit.com/$host/64"
+        return "https://$host/favicon.ico"
     }
 
     fun obtainAccountType():String{
