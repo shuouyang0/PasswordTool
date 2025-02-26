@@ -81,6 +81,18 @@ fun DetailPage(
     viewModel.obtainRecordById(recordId)
     val record by viewModel.pageRecord.collectAsStateWithLifecycle()
     Log.d("DetailPage", "$recordId $record")
+    Detail(record = record, onBack = onBack, onComplete = {
+        viewModel.insertRecord(it)
+    })
+}
+
+@Composable
+fun Detail(
+    record: PasswordRecord? = null,
+    onBack: () -> Unit = {},
+    onComplete: (PasswordRecord) -> Unit = {},
+    modifier: Modifier = Modifier
+) {
     val scheme = MaterialTheme.colorScheme
     var websiteLink by remember(record) { mutableStateOf(record?.websiteLink ?: "") }
     var account by remember(record) { mutableStateOf(record?.account ?: "") }
@@ -109,7 +121,7 @@ fun DetailPage(
                 modifyDate = if (record == null) -1 else TimeExt.now(),
                 id = record?.id,
             )
-            viewModel.insertRecord(newRecord)
+            onComplete(newRecord)
             onBack()
         })
         HorizontalDivider(color = MaterialTheme.colorScheme.onBackground)
@@ -162,7 +174,7 @@ fun DetailPage(
             modifier = Modifier.then(editModifier)
         )
 
-        var export by remember { mutableStateOf(true) }
+        var export by remember { mutableStateOf(false) }
 
         DividerExportWidget(
             label = stringResource(Res.string.more),
@@ -214,10 +226,12 @@ fun PageTitleBar(
 ) {
     val height = 60.dp
     Row(modifier = modifier.fillMaxWidth().height(height)) {
-        Image(painter = painterResource(Res.drawable.ic_back),
+        Image(
+            painter = painterResource(Res.drawable.ic_back),
             contentDescription = "back",
             colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onPrimaryContainer),
-            modifier = Modifier.size(height).clickable { onBack() }.padding(20.dp))
+            modifier = Modifier.size(height).clickable { onBack() }.padding(20.dp)
+        )
         Text(
             text = title,
             textAlign = TextAlign.Center,

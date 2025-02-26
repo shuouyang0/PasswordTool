@@ -125,23 +125,38 @@ fun obtainTestData(): LazyPagingItems<PasswordRecord> {
 fun HomePage(
     navToDetail: (Long?) -> Unit = {}
 ) {
-    val scheme = MaterialTheme.colorScheme
     val viewModel = koinViewModel<HomeViewModel>()
     var pager by remember { mutableStateOf(viewModel.obtainAllRecord()) }
     val items = pager.flow.collectAsLazyPagingItems()
+    Home(
+        items = items,
+        onDeleteRecord = { viewModel.deleteRecord(it) },
+        onEditRecord = { navToDetail(it.id) },
+        onValueChange = {  pager = viewModel.searchRecord(it) },
+        onAddRecord = { navToDetail(-1) }
+    )
+}
 
-    Column(modifier = Modifier.fillMaxSize().background(scheme.background)) {
+@Composable
+fun Home(
+    items: LazyPagingItems<PasswordRecord>,
+    onDeleteRecord: (PasswordRecord) -> Unit = {},
+    onEditRecord: (PasswordRecord) -> Unit = {},
+    onValueChange: (String) -> Unit = {},
+    onAddRecord: () -> Unit = {},
+    modifier: Modifier = Modifier
+) {
+    val scheme = MaterialTheme.colorScheme
+    Column(modifier = modifier.fillMaxSize().background(scheme.background)) {
         PasswordRecordList(
             items = items,
-            onDeleteRecord = { viewModel.deleteRecord(it) },
-            onEditRecord = { navToDetail(it.id) },
+            onDeleteRecord = onDeleteRecord,
+            onEditRecord = onEditRecord,
             modifier = Modifier.fillMaxWidth().weight(1f).background(scheme.onBackground)
         )
         SearchBar(
-            onValueChange = {
-                pager = viewModel.searchRecord(it)
-            },
-            onAddRecord = { navToDetail(-1) },
+            onValueChange = onValueChange,
+            onAddRecord = onAddRecord,
             modifier = Modifier.fillMaxWidth().height(60.dp).background(scheme.secondaryContainer)
         )
     }

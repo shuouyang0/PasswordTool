@@ -8,25 +8,40 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import org.shu.tool.password.base.module.PasswordRecord
-import org.shu.tool.password.ui.page.detail.DetailPage
+import org.shu.tool.password.ui.page.detail.Detail
 import org.shu.tool.password.ui.page.detail.PageTitleBar
 import org.shu.tool.password.ui.page.home.DragBar
-import org.shu.tool.password.ui.page.home.HomePage
+import org.shu.tool.password.ui.page.home.Home
 import org.shu.tool.password.ui.page.home.KeyRecordDefaultItem
 import org.shu.tool.password.ui.page.home.KeyRecordExportItem
 import org.shu.tool.password.ui.page.home.PasswordRecordItem
 import org.shu.tool.password.ui.page.home.PasswordWidget
 import org.shu.tool.password.ui.page.home.PasswordWidgetLabel
 import org.shu.tool.password.ui.page.home.SearchBar
+import org.shu.tool.password.ui.page.home.obtainTestData
 import org.shu.tool.password.ui.theme.PasswordToolTheme
 
-private val testData = obtainTestData()
+private val testData = List(20) {
+    PasswordRecord(
+        id = 0,
+        websiteLink = "https://www.baidu.com",
+        account = "shuouyang0@gmail.com",
+        accountType = PasswordRecord.ACCOUNT_TYPE_EMAIL,
+        passwordType = PasswordRecord.PASSWORD_TYPE_STRONG,
+        cipher = "jlksjflkasjflj",
+        registerDate = System.currentTimeMillis(),
+        //        nickname = "百度",
+        remark = "这是简单的备注，用于测试",
+        username = "shuouyang",
+        modifyDate = System.currentTimeMillis() + 20
+    )
+}
 
 @Preview
 @Composable
 fun HomePreview() {
     PasswordToolTheme {
-        HomePage()
+        Home(obtainTestData())
     }
 }
 
@@ -62,7 +77,7 @@ private fun KeyRecordExportItemPreview() {
         KeyRecordExportItem(testData[0])
     }
 }
-@Preview
+@Preview(heightDp = 70, widthDp = 440)
 @Composable
 private fun PasswordWidgetPreview() {
     PasswordToolTheme {
@@ -76,7 +91,7 @@ private fun PasswordWidgetLabelPreview() {
         PasswordWidgetLabel(1)
     }
 }
-@Preview
+@Preview(heightDp = 70, widthDp = 440)
 @Composable
 private fun DragBarPreview() {
     PasswordToolTheme {
@@ -95,26 +110,9 @@ private fun PageTitleBarPreview() {
 @Composable
 private fun DetailPagePreview() {
     PasswordToolTheme {
-        DetailPage()
+        Detail()
     }
 }
 
 
 
-fun obtainTestData(): List<PasswordRecord> {
-    return List(20) {
-        PasswordRecord(
-            id = 0,
-            websiteLink = "https://www.baidu.com",
-            account = "shuouyang0@gmail.com",
-            accountType = PasswordRecord.ACCOUNT_TYPE_EMAIL,
-            passwordType = PasswordRecord.PASSWORD_TYPE_STRONG,
-            cipher = "jlksjflkasjflj",
-            registerDate = System.currentTimeMillis(),
-            //        nickname = "百度",
-            remark = "这是简单的备注，用于测试",
-            username = "shuouyang",
-            modifyDate = System.currentTimeMillis() + 20
-        )
-    }
-}
