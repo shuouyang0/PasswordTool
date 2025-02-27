@@ -4,9 +4,12 @@
 
 > 偏向于练手，目前 Android 与 Desktop 端能够成功编译运行，IOS 上因为 [KSP 的问题](https://issuetracker.google.com/issues/398414973)待解决
 
-<img src="./img/HomePage.png" alt="首页样图" style="zoom:10%;" />
+<figure>
+<img src="./img/HomePage.png" width=200/>
+<img src="./img/DetailPage.png" width=200/>
+</figure>
 
-<img src="./img/DetailPage.png" alt="编辑页样图" style="zoom:10%;" />
+
 
 ## 使用到的依赖项有
 
