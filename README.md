@@ -4,10 +4,10 @@
 
 > Primarily a practice project. Currently, it can be successfully compiled and run on Android and Desktop. The iOS version is pending due to [KSP2 issues](https://issuetracker.google.com/issues/398414973).
 
-<figure>
+<center>
 <img src="./img/HomePage.png" width=200/>
 <img src="./img/DetailPage.png" width=200/>
-</figure>
+</center>
 
 
 

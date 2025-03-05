@@ -4,10 +4,10 @@
 
 > 偏向于练手，目前 Android 与 Desktop 端能够成功编译运行，IOS 上因为 [KSP 的问题](https://issuetracker.google.com/issues/398414973)待解决
 
-<figure>
+<center>
 <img src="./img/HomePage.png" width=200/>
 <img src="./img/DetailPage.png" width=200/>
-</figure>
+</center>
 
 
 
