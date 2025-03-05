@@ -1,5 +1,10 @@
 # 基于 Kotlin / Compose Multiplatform 的密码记录工具
 
+<div align="center">
+  <img src="./img/HomePage.png" width="200" style="margin-right: 20px;"/>
+  <img src="./img/DetailPage.png" width="200"/>
+</div>
+
 [English Doc](https://./README.md)
 
 ## 背景
@@ -15,10 +20,9 @@
 > 本项目偏重于练手，支持 Android、iOS 和 Desktop 三端运行。
 
 <div align="center">
-  <img src="./img/HomePage.png" width="200" style="margin-right: 20px;"/>
   <img src="./img/screenshot.gif" width="200"/>
-  <img src="./img/DetailPage.png" width="200"/>
 </div>
+
 
 
 ------

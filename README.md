@@ -1,5 +1,10 @@
 # Password Management Tool Based on Kotlin/Compose Multiplatform
 
+<div align="center">
+  <img src="./img/HomePage.png" width="200" style="margin-right: 20px;"/>
+  <img src="./img/DetailPage.png" width="200"/>
+</div>
+
 [中文文档](./README_zh.md)
 
 ## Background
@@ -15,10 +20,9 @@ Therefore, I decided to develop a cross-platform password tool using Kotlin/Comp
 > This project is more of a hands-on exercise and supports running on Android, iOS, and Desktop.
 
 <div align="center">
-  <img src="./img/HomePage.png" width="200" style="margin-right: 20px;"/>
   <img src="./img/screenshot.gif" width="200"/>
-  <img src="./img/DetailPage.png" width="200"/>
 </div>
+
 
 
 
