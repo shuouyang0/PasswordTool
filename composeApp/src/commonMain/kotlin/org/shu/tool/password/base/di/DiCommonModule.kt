@@ -14,15 +14,15 @@ import org.shu.tool.password.ui.page.detail.DetailViewModel
 import org.koin.core.context.startKoin
 import org.koin.dsl.KoinAppDeclaration
 import org.koin.dsl.includes
-import org.shu.tool.password.getDatabase
+import org.shu.tool.password.base.db.getRoomDatabase
 
 private val appModule = module {
     factory { getPlatform(this) }
 }
 private val databaseModule
     get() = module {
-        single{ getDatabase(this) }
-        singleOf(AppDatabase::passwordRecordDao)
+        single{ getRoomDatabase(this) }
+        single{ get<AppDatabase>().passwordRecordDao() }
     }
 
 private val networkModule

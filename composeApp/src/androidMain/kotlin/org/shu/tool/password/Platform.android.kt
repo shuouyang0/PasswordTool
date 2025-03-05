@@ -3,8 +3,7 @@ package org.shu.tool.password
 import android.content.Context
 import android.os.Build
 import androidx.room.Room
-import androidx.sqlite.driver.bundled.BundledSQLiteDriver
-import kotlinx.coroutines.Dispatchers
+import androidx.room.RoomDatabase
 import org.shu.tool.password.base.common.DATABASE_FILENAME
 import org.shu.tool.password.base.db.AppDatabase
 import org.koin.core.scope.Scope
@@ -16,9 +15,12 @@ class AndroidPlatform(context: Context) : Platform {
 actual fun getPlatform(scope: Scope): Platform = AndroidPlatform(scope.get())
 
 
-actual fun getDatabase(scope: Scope): AppDatabase {
-    return Room.databaseBuilder(scope.get(), AppDatabase::class.java, DATABASE_FILENAME)
-        .setDriver(BundledSQLiteDriver())
-        .setQueryCoroutineContext(Dispatchers.IO)
-        .build()
+actual fun getDatabaseBuilder(scope: Scope): RoomDatabase.Builder<AppDatabase>  {
+    val appContext = scope.get<Context>()
+    val dbFile = appContext.getDatabasePath(DATABASE_FILENAME)
+
+    return  Room.databaseBuilder<AppDatabase>(
+        context = appContext,
+        name = dbFile.absolutePath
+    )
 }
