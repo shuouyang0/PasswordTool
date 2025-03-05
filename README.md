@@ -16,8 +16,10 @@ Therefore, I decided to develop a cross-platform password tool using Kotlin/Comp
 
 <div align="center">
   <img src="./img/HomePage.png" width="200" style="margin-right: 20px;"/>
+  <img src="./img/screenshot.gif" width="200"/>
   <img src="./img/DetailPage.png" width="200"/>
 </div>
+
 
 
 ---
