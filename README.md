@@ -14,10 +14,11 @@ Therefore, I decided to develop a cross-platform password tool using Kotlin/Comp
 
 > This project is more of a hands-on exercise and supports running on Android, iOS, and Desktop.
 
-<center>
-<img src="./img/HomePage.png" width=200/>
-<img src="./img/DetailPage.png" width=200/>
-</center>
+<div align="center">
+  <img src="./img/HomePage.png" width="200" style="margin-right: 20px;"/>
+  <img src="./img/DetailPage.png" width="200"/>
+</div>
+
 
 ---
 
