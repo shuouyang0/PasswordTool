@@ -30,7 +30,7 @@ private fun documentDirectory(): String {
 }
 
 actual fun getDatabaseBuilder(scope: Scope): RoomDatabase.Builder<AppDatabase>{
-    val dbFilePath = documentDirectory() + DATABASE_FILENAME
+    val dbFilePath = documentDirectory() + "/" +  DATABASE_FILENAME
     return Room.databaseBuilder<AppDatabase>(
         name = dbFilePath,
     )
