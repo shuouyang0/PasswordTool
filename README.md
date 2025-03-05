@@ -1,35 +1,68 @@
-# A Password Management Tool Based on Kotlin/Compose Multiplatform
+# Password Management Tool Based on Kotlin/Compose Multiplatform
 
 [中文文档](./README_zh.md)
 
-> Primarily a practice project. Currently, it can be successfully compiled and run on Android and Desktop. The iOS version is pending due to [KSP2 issues](https://issuetracker.google.com/issues/398414973).
+## Background
+
+As a developer, I frequently need to log in to numerous websites across various devices and operating systems. Each website has different password requirements, and using the same password for all sites poses security risks, while using different passwords makes them hard to remember.
+
+## Solution
+
+The solution is to remember only one private key. By combining the website URL and login account (email or phone number), a password is generated that meets the requirements of most websites (including lowercase letters, uppercase letters, numbers, and special characters). For security reasons, the password is not stored directly; instead, its SHA-256 encrypted value is saved. To view the plaintext password, the private key must be entered for verification, and upon successful verification, the plaintext password is dynamically calculated. The tool also supports copying the password.
+
+Therefore, I decided to develop a cross-platform password tool using Kotlin/Compose Multiplatform.
+
+> This project is more of a hands-on exercise and supports running on Android, iOS, and Desktop.
 
 <center>
 <img src="./img/HomePage.png" width=200/>
 <img src="./img/DetailPage.png" width=200/>
 </center>
 
+---
 
+## Features and Interaction
 
-## Dependencies Used
+- **Home Page**: Displays added password records and supports fuzzy search via a bottom search bar.
+- **Add Record**: Click the plus button at the bottom to navigate to the add password page.
+- **View Password**: Click on a record item to preview relevant information and enter the private key to display the plaintext password.
+- **Edit Record**: Long-press a record item to navigate to the edit page.
+- **Delete Record**: Swipe right on a record item to reveal the delete button.
 
-- **Coil**: Image Loading - [https://coil-kt.github.io/coil/compose/](https://coil-kt.github.io/coil/compose/)
-- **Ktor**: HTTP Client - [https://ktor.io/docs/client-create-multiplatform-application.html#android-activity](https://ktor.io/docs/client-create-multiplatform-application.html#android-activity)
-- **Koin**: Dependency Injection - [https://insert-koin.io/docs/quickstart/cmp/](https://insert-koin.io/docs/quickstart/cmp/)
-- **Room**: Database - [https://developer.android.com/kotlin/multiplatform/room?hl=zh-cn](https://developer.android.com/kotlin/multiplatform/room?hl=zh-cn)
-- **Paging**: Pagination Library - [https://github.com/cashapp/multiplatform-paging](https://github.com/cashapp/multiplatform-paging)
-- **Hash**: Hashing Library - [https://github.com/KotlinCrypto/hash/](https://github.com/KotlinCrypto/hash/)
-- **Serialization**: Serialization - [https://github.com/Kotlin/kotlinx.serialization](https://github.com/Kotlin/kotlinx.serialization)
-- **Navigation**: Navigation - [https://www.jetbrains.com/help/kotlin-multiplatform-dev/compose-navigation-routing.html](https://www.jetbrains.com/help/kotlin-multiplatform-dev/compose-navigation-routing.html)
+---
+
+## Tech Stack
+
+- **Coil**: Image Loading - [Coil Docs](https://coil-kt.github.io/coil/compose/)
+- **Ktor**: HTTP Client - [Ktor Docs](https://ktor.io/docs/client-create-multiplatform-application.html#android-activity)
+- **Koin**: Dependency Injection - [Koin Docs](https://insert-koin.io/docs/quickstart/cmp/)
+- **Room**: Database - [Room Docs](https://developer.android.com/kotlin/multiplatform/room?hl=zh-cn)
+- **Paging**: Pagination Library - [Paging Repo](https://github.com/cashapp/multiplatform-paging)
+- **Hash**: Hash Encoding Library - [Hash Repo](https://github.com/KotlinCrypto/hash/)
+- **Serialization**: Serialization - [Serialization Repo](https://github.com/Kotlin/kotlinx.serialization)
+- **Navigation**: Navigation - [Navigation Docs](https://www.jetbrains.com/help/kotlin-multiplatform-dev/compose-navigation-routing.html)
+
+---
 
 ## Planned Features
 
-- Add / Modify / Search / Delete Website Records ✔️
-- Password Generation Algorithm Based on Private Key ✔️
-- Automatic Password Copy to Clipboard ✔️
-- Display Website Icon Based on URL ✔️ (Can be optimized)
-- Scan QR Code to Add Website on Android / iOS
+- **Core Features**  
+  - Add / Edit / Search / Delete Website Records ✔️  
+  - Password Generation Algorithm Based on Private Key ✔️  
+  - Automatically Copy Password to Clipboard ✔️  
+  - Display Website Icon Based on URL ✔️ (Can be optimized)
+
+- **Upcoming Features**  
+  - QR Code Scanning for Adding Websites on Android/iOS  
+  - Multi-device Password Synchronization (Backend support required)  
+  - Code Optimization
+
+---
 
 ## Known Issues
 
-The iOS version fails to compile due to [KSP2 issues](https://issuetracker.google.com/issues/398414973). Waiting for an official fix before further updates.
+- **iOS Compilation Issue**: Due to a [KSP issue](https://issuetracker.google.com/issues/398414973), iOS compilation consistently fails. Expected to be resolved by 2025.3.5.
+
+---
+
+The restructured document is clearer and easier to read and maintain.
